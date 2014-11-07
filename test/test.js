@@ -30,6 +30,11 @@ describe('postcss-nested', function () {
               'a:hover, a:active { }');
     });
 
+    it('replaces ampersand in string', function () {
+        check('.block { &_elem { } }',
+              '.block_elem { }');
+    });
+
     it('unwraps at-rule');
 
     it('unwraps at-rule with rules inside');
