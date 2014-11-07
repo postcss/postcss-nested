@@ -30,4 +30,10 @@ describe('postcss-nested', function () {
               'a:hover, a:active { }');
     });
 
+    it('unwraps at-rule');
+
+    it('unwraps at-rule with rules inside');
+
+    it('fix spaces in uncompressed CSS');
+
 });
