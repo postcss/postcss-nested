@@ -11,9 +11,11 @@ var move = function (rule, after) {
 
     if ( !after ) after = last;
 
-    var clone = rule.clone({ selector: selector.join(' ') });
+    var before = rule.before;
+    var clone  = rule.clone({ selector: selector.join(' ') });
     rule.removeSelf();
     root.insertAfter(after, clone);
+    clone.before = before;
     return clone;
 };
 

@@ -12,12 +12,12 @@ describe('postcss-nested', function () {
 
     it('unwraps rule inside rule', function () {
         check('a { a: 1; b { b: 2; c { c: 3 } } }',
-              'a { a: 1 }a b { b: 2 }a b c { c: 3 }');
+              'a { a: 1 } a b { b: 2 } a b c { c: 3 }');
     });
 
     it('cleans rules after unwrap', function () {
         check('a { b .one {} b .two {} }',
-              'a b .one {}a b .two {}');
+              'a b .one {} a b .two {}');
     });
 
 });
