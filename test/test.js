@@ -20,4 +20,14 @@ describe('postcss-nested', function () {
               'a b .one {} a b .two {}');
     });
 
+    it('replaces ampersand', function () {
+        check('a { body &:hover b {} }',
+              'body a:hover b {}');
+    });
+
+    it('replaces ampersands', function () {
+        check('a { &:hover, &:active { } }',
+              'a:hover, a:active { }');
+    });
+
 });

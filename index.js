@@ -1,6 +1,6 @@
 var move = function (rule, after) {
     var selector = [];
-    var root     = rule;
+    var root     = rule.parent;
     var last     = null;
 
     do {
@@ -9,10 +9,18 @@ var move = function (rule, after) {
         root = root.parent;
     } while ( root.parent );
 
+    if ( rule.selector.indexOf('&') == -1 ) {
+        selector.push(rule.selector);
+        selector = selector.join(' ');
+    } else {
+        selector = selector.join(' ');
+        selector = rule.selector.replace(/&/g, selector);
+    }
+
     if ( !after ) after = last;
 
     var before = rule.before;
-    var clone  = rule.clone({ selector: selector.join(' ') });
+    var clone  = rule.clone({ selector: selector });
     rule.removeSelf();
     root.insertAfter(after, clone);
     clone.before = before;
@@ -24,7 +32,7 @@ var rule = function (rule) {
     var unwraped    = false;
     var insertAfter = false;
     for ( var i = 0; i < rule.childs.length; i++ ) {
-        var child = rule.childs[i];
+        child = rule.childs[i];
 
         if ( child.type == 'rule' ) {
             unwraped = true;
@@ -32,7 +40,7 @@ var rule = function (rule) {
             i--;
         }
     }
-    if ( unwraped && rule.childs.length == 0 ) rule.removeSelf();
+    if ( unwraped && rule.childs.length === 0 ) rule.removeSelf();
 };
 
 var process = function (css) {
