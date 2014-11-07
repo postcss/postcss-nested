@@ -15,4 +15,9 @@ describe('postcss-nested', function () {
               'a { a: 1 }a b { b: 2 }a b c { c: 3 }');
     });
 
+    it('cleans rules after unwrap', function () {
+        check('a { b .one {} b .two {} }',
+              'a b .one {}a b .two {}');
+    });
+
 });
