@@ -9,14 +9,17 @@
         "type": "git",
         "url":  "https://github.com/postcss/postcss-nested.git"
     },
+    "peerDependencies": {
+        "postcss": "postcss/postcss"
+    },
     "devDependencies": {
-        "jshint-stylish":         "1.0.0",
-        "gulp-jshint":            "1.9.0",
-        "gulp-mocha":             "1.1.1",
-        "postcss":                "postcss/postcss",
-        "mocha":                  "2.0.1",
-        "chai":                   "1.9.2",
-        "gulp":                   "3.8.10"
+        "jshint-stylish": "1.0.0",
+        "gulp-jshint":    "1.9.0",
+        "gulp-mocha":     "1.1.1",
+        "postcss":        "postcss/postcss",
+        "mocha":          "2.0.1",
+        "chai":           "1.9.2",
+        "gulp":           "3.8.10"
     },
     "scripts": {
         "test": "gulp"
