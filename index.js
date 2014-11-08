@@ -1,42 +1,65 @@
-var move = function (rule, after) {
-    var selector = [];
-    var root     = rule.parent;
-    var last     = null;
-
-    do {
-        selector.unshift(root.selector);
-        last = root;
-        root = root.parent;
-    } while ( root.parent && root.type != 'atrule' );
-
-    if ( rule.selector.indexOf('&') == -1 ) {
-        selector.push(rule.selector);
-        selector = selector.join(' ');
+var selector = function (parent, node) {
+    if ( node.selector.indexOf('&') == -1 ) {
+        return parent.selector + ' ' + node.selector;
     } else {
-        selector = selector.join(' ');
-        selector = rule.selector.replace(/&/g, selector);
+        return node.selector.replace(/&/g, parent.selector);
     }
+};
 
-    if ( !after ) after = last;
-
-    var before = rule.before;
-    var clone  = rule.clone({ selector: selector });
-    rule.removeSelf();
-    root.insertAfter(after, clone);
-    clone.before = before;
+var move = function (what, where, after) {
+    var clone = what.clone();
+    what.removeSelf();
+    where.insertAfter(after, clone);
     return clone;
 };
 
+var atrule = function (rule, atrule, after) {
+    var clone;
+    var decls = [];
+    atrule.each(function (node) {
+        if ( node.type == 'decl' ) {
+            clone = node.clone();
+            clone.before = node.before;
+            decls.push( clone );
+            node.removeSelf();
+        } else if ( node.type == 'rule' ) {
+            node.selector = selector(rule, node);
+        }
+    });
+    if ( decls.length ) {
+        clone = rule.clone({ childs: [] });
+        for ( var i = 0; i < decls.length; i++ ) {
+            clone.append( decls[i] );
+        }
+        atrule.prepend(clone);
+        clone.before = atrule.before;
+    }
+
+    return move(atrule, rule.parent, after || rule.parent);
+};
+
+var moveRule = function (rule, after) {
+    var to     = rule.parent.parent;
+    var before = rule.before;
+    var moved  = move(rule, to, after || rule.parent);
+    moved.selector = selector(rule.parent, moved);
+    moved.before   = rule.before;
+    return moved;
+};
+
 var rule = function (rule) {
-    var unwraped    = false;
+    var unwrapped   = false;
     var insertAfter = false;
     rule.each(function (child) {
         if ( child.type == 'rule' ) {
-            unwraped = true;
-            insertAfter = move(child, insertAfter);
+            unwrapped = true;
+            insertAfter = moveRule(child, insertAfter);
+        } else if ( child.type == 'atrule' ) {
+            unwrapped = true;
+            insertAfter = atrule(rule, child, insertAfter);
         }
     });
-    if ( unwraped && rule.childs.length === 0 ) rule.removeSelf();
+    if ( unwrapped && rule.childs.length === 0 ) rule.removeSelf();
 };
 
 var process = function (node) {

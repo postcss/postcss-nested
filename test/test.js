@@ -40,7 +40,10 @@ describe('postcss-nested', function () {
               '@media (max-width: 500px) { a b { } }');
     });
 
-    it('unwraps at-rule');
+    it('unwraps at-rule', function () {
+        check('.block { .el { @media (max-width: 500px) { width: auto } } }',
+              '@media (max-width: 500px) { .block .el { width: auto } }');
+    });
 
     it('unwraps at-rule with rules inside');
 
