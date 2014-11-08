@@ -35,6 +35,11 @@ describe('postcss-nested', function () {
               '.block_elem { }');
     });
 
+    it('unwrap rules inside at-rules', function () {
+        check('@media (max-width: 500px) { a { b { } } }',
+              '@media (max-width: 500px) { a b { } }');
+    });
+
     it('unwraps at-rule');
 
     it('unwraps at-rule with rules inside');
