@@ -55,6 +55,4 @@ describe('postcss-nested', function () {
               '@media (max-width: 5px) { @supports (a: 1) { a { a: 1 } } }');
     });
 
-    it('fix spaces in uncompressed CSS');
-
 });
