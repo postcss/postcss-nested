@@ -13,7 +13,7 @@ var move = function (what, where, after) {
     return clone;
 };
 
-var atrule = function (rule, atrule, after) {
+var atruleChilds = function (rule, atrule) {
     var clone;
     var decls = [];
     atrule.each(function (node) {
@@ -24,6 +24,8 @@ var atrule = function (rule, atrule, after) {
             node.removeSelf();
         } else if ( node.type == 'rule' ) {
             node.selector = selector(rule, node);
+        } else if ( node.type == 'atrule' ) {
+            atruleChilds(rule, node);
         }
     });
     if ( decls.length ) {
@@ -34,7 +36,10 @@ var atrule = function (rule, atrule, after) {
         atrule.prepend(clone);
         clone.before = atrule.before;
     }
+};
 
+var moveAtrule = function (rule, atrule, after) {
+    atruleChilds(rule, atrule);
     return move(atrule, rule.parent, after || rule.parent);
 };
 
@@ -56,7 +61,7 @@ var rule = function (rule) {
             insertAfter = moveRule(child, insertAfter);
         } else if ( child.type == 'atrule' ) {
             unwrapped = true;
-            insertAfter = atrule(rule, child, insertAfter);
+            insertAfter = moveAtrule(rule, child, insertAfter);
         }
     });
     if ( unwrapped && rule.childs.length === 0 ) rule.removeSelf();

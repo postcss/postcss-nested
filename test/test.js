@@ -50,7 +50,10 @@ describe('postcss-nested', function () {
               '@media (max-width: 500px) { a b { color: black } }');
     });
 
-    it('unwraps at-rule with rules inside');
+    it('unwraps at-rules', function () {
+        check('a { @media (max-width: 5px) { @supports (a: 1) { a: 1 } } }',
+              '@media (max-width: 5px) { @supports (a: 1) { a { a: 1 } } }');
+    });
 
     it('fix spaces in uncompressed CSS');
 
