@@ -45,6 +45,11 @@ describe('postcss-nested', function () {
               '@media (max-width: 500px) { .block .el { width: auto } }');
     });
 
+    it('unwraps at-rule with rules', function () {
+        check('a { @media (max-width: 500px) { b { color: black } } }',
+              '@media (max-width: 500px) { a b { color: black } }');
+    });
+
     it('unwraps at-rule with rules inside');
 
     it('fix spaces in uncompressed CSS');
