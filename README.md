@@ -77,7 +77,7 @@ gulp.task('css', function () {
 
 ### Node
 
-```
+```js
 var postcss = require('postcss');
 var nested  = require('postcss-nested');
 
