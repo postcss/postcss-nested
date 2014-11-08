@@ -9,9 +9,6 @@
         "type": "git",
         "url":  "https://github.com/postcss/postcss-nested.git"
     },
-    "peerDependencies": {
-        "postcss": "postcss/postcss"
-    },
     "devDependencies": {
         "jshint-stylish": "1.0.0",
         "gulp-jshint":    "1.9.0",
