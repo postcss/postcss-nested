@@ -8,16 +8,16 @@ like it Sass does.
 ```css
 .phone {
     &_title {
-        width: 500px
+        width: 500px;
         @media (max-width: 500px) {
-            width: auto
+            width: auto;
         }
     }
     body.is_dark &_title {
-        color: white
+        color: white;
     }
     img {
-        display: block
+        display: block;
     }
 }
 ```
@@ -26,18 +26,18 @@ will be processed to:
 
 ```css
 .phone_title {
-    width: 500px
+    width: 500px;
 }
 @media (max-width: 500px) {
     .phone_title {
-        width: auto
+        width: auto;
     }
 }
 body.is_dark phone_title {
-    color: white
+    color: white;
 }
 .phone img {
-    display: block
+    display: block;
 }
 ```
 
