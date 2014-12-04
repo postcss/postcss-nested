@@ -1,4 +1,4 @@
-# PostCSS Nested [![Build Status](https://travis-ci.org/postcss/postcss-nested.png)](https://travis-ci.org/postcss/postcss-nested)
+# PostCSS Nested [![Build Status](https://travis-ci.org/postcss/postcss-nested.svg)](https://travis-ci.org/postcss/postcss-nested)
 
 <img align="right" width="135" height="95" src="http://postcss.github.io/postcss/logo-leftp.png" title="Philosopher’s stone, logo of PostCSS">
 
