@@ -10,13 +10,13 @@
         "url":  "https://github.com/postcss/postcss-nested.git"
     },
     "peerDependencies": {
-        "postcss": "^3.0.0"
+        "postcss": "^4.0.0"
     },
     "devDependencies": {
         "jshint-stylish": "1.0.0",
         "gulp-jshint":    "1.9.0",
         "gulp-mocha":     "2.0.0",
-        "postcss":        "git://github.com/postcss/postcss.git#v4.0",
+        "postcss":        "4.0.0",
         "mocha":          "2.1.0",
         "chai":           "1.10.0",
         "gulp":           "3.8.10"
