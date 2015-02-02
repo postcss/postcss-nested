@@ -1,3 +1,6 @@
+## 0.2.1
+* Add comma support to selectors unwrap.
+
 ## 0.2
 * Use PostCSS 4.0.
 * Fix indent, when move rules to other parent.
