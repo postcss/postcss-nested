@@ -55,6 +55,21 @@ describe('postcss-nested', function () {
               'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }');
     });
 
+    it('processes comma', function () {
+        check('.one, .two { a {} }',
+              '.one a, .two a {}');
+    });
+
+    it('processes comma with ampersand', function () {
+        check('.one, .two { &:hover {} }',
+              '.one:hover, .two:hover {}');
+    });
+
+    it('processes comma inside', function () {
+        check('a, b { .one, .two {} }',
+              'a .one, a .two, b .one, b .two {}');
+    });
+
     it('parses example', function () {
         var input =  '.phone {\n' +
                      '    &_title {\n' +

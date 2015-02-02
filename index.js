@@ -1,9 +1,19 @@
+var list = require('postcss/lib/list');
+
 var selector = function (parent, node) {
-    if ( node.selector.indexOf('&') == -1 ) {
-        return parent.selector + ' ' + node.selector;
-    } else {
-        return node.selector.replace(/&/g, parent.selector);
-    }
+    return list.comma(parent.selector)
+        .map(function (i) {
+            return list.comma(node.selector)
+                .map(function (j) {
+                    if ( j.indexOf('&') == -1 ) {
+                        return i + ' ' + j;
+                    } else {
+                        return j.replace(/&/g, i);
+                    }
+                })
+                .join(', ');
+        })
+        .join(', ');
 };
 
 var atruleChilds = function (rule, atrule) {
