@@ -2,8 +2,7 @@
 
 <img align="right" width="135" height="95" src="http://postcss.github.io/postcss/logo-leftp.png" title="Philosopher’s stone, logo of PostCSS">
 
-[PostCSS](https://github.com/postcss/postcss) plugin to unwrap nested rules
-like how Sass does it.
+[PostCSS] plugin to unwrap nested rules like how Sass does it.
 
 ```css
 .phone {
@@ -44,6 +43,8 @@ body.is_dark phone_title {
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
+
+[PostCSS]: https://github.com/postcss/postcss
 
 ## Usage
 
