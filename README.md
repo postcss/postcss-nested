@@ -44,3 +44,11 @@ body.is_dark phone_title {
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
+
+## Usage
+
+```js
+postcss([ require('postcss-nested') ])
+```
+
+See [PostCSS] docs for examples for your environment.
