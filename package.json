@@ -14,7 +14,7 @@
     },
     "devDependencies": {
         "jshint-stylish": "1.0.0",
-        "gulp-jshint":    "1.9.1",
+        "gulp-jshint":    "1.9.2",
         "gulp-mocha":     "2.0.0",
         "postcss":        "4.0.3",
         "mocha":          "2.1.0",
