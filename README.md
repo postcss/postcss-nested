@@ -11,9 +11,9 @@
         @media (max-width: 500px) {
             width: auto;
         }
-    }
-    body.is_dark &_title {
-        color: white;
+        body.is_dark & {
+            color: white;
+        }
     }
     img {
         display: block;
@@ -32,7 +32,7 @@ will be processed to:
         width: auto;
     }
 }
-body.is_dark phone_title {
+body.is_dark .phone_title {
     color: white;
 }
 .phone img {
