@@ -1,3 +1,6 @@
+## 0.2.2
+* Module returns function to have common PostCSS API.
+
 ## 0.2.1
 * Add comma support to selectors unwrap.
 
