@@ -62,4 +62,8 @@ var process = function (node) {
     });
 };
 
-module.exports = { postcss: process };
+module.exports = function () {
+    return process;
+};
+
+module.exports.postcss = process;
