@@ -50,6 +50,11 @@ describe('postcss-nested', function () {
               '@media screen {\n    a b {\n        color: black\n    }\n}');
     });
 
+    it('doesnt unwrap at-extends', function () {
+        check('a { color: black; @extend foo; }',
+              'a { color: black; @extend foo; }');
+    });
+
     it('unwraps at-rules', function () {
         check('a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
               'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }');

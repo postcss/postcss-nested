@@ -43,7 +43,7 @@ var rule = function (rule) {
             unwrapped = true;
             child.selector = selector(rule, child);
             after = child.moveAfter(after);
-        } else if ( child.type == 'atrule' ) {
+        } else if ( child.type == 'atrule' && child.nodes !== undefined ) {
             unwrapped = true;
             atruleChilds(rule, child);
             after = child.moveAfter(after);
