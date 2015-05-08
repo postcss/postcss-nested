@@ -1,19 +1,15 @@
 var postcss = require('postcss');
 
 var selector = function (parent, node) {
-    return postcss.list.comma(parent.selector)
-        .map(function (i) {
-            return postcss.list.comma(node.selector)
-                .map(function (j) {
-                    if ( j.indexOf('&') === -1 ) {
-                        return i + ' ' + j;
-                    } else {
-                        return j.replace(/&/g, i);
-                    }
-                })
-                .join(', ');
-        })
-        .join(', ');
+    return parent.selectors.map(function (i) {
+        return node.selectors.map(function (j) {
+            if ( j.indexOf('&') === -1 ) {
+                return i + ' ' + j;
+            } else {
+                return j.replace(/&/g, i);
+            }
+        }).join(', ');
+    }).join(', ');
 };
 
 var atruleChilds = function (rule, atrule) {
