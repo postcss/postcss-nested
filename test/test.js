@@ -12,7 +12,7 @@ describe('postcss-nested', function () {
 
     it('unwraps rule inside rule', function () {
         check('a { a: 1 } a { a: 1; b { b: 2; c { c: 3 } } }',
-              'a { a: 1 } a { a: 1 } a b { b: 2 } a b c { c: 3 }');
+              'a { a: 1 } a { a: 1; } a b { b: 2; } a b c { c: 3 }');
     });
 
     it('cleans rules after unwrap', function () {
@@ -86,11 +86,11 @@ describe('postcss-nested', function () {
                      '    }\n' +
                      '}';
         var output = '.phone_title {\n' +
-                     '    width: 500px\n' +
+                     '    width: 500px;\n' +
                      '}\n' +
                      '@media (max-width: 500px) {\n' +
                      '    .phone_title {\n' +
-                     '        width: auto\n' +
+                     '        width: auto;\n' +
                      '    }\n' +
                      '}\n' +
                      'body.is_dark .phone_title {\n' +

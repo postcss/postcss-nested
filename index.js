@@ -45,7 +45,13 @@ var processRule = function (rule) {
             after = child.moveAfter(after);
         }
     });
-    if ( unwrapped && rule.nodes.length === 0 ) rule.removeSelf();
+    if ( unwrapped ) {
+        if ( rule.nodes.length === 0 ) {
+            rule.removeSelf();
+        } else {
+            rule.semicolon = true;
+        }
+    }
 };
 
 var process = function (node) {
