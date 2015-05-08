@@ -1,9 +1,9 @@
-var list = require('postcss/lib/list');
+var postcss = require('postcss');
 
 var selector = function (parent, node) {
-    return list.comma(parent.selector)
+    return postcss.list.comma(parent.selector)
         .map(function (i) {
-            return list.comma(node.selector)
+            return postcss.list.comma(node.selector)
                 .map(function (j) {
                     if ( j.indexOf('&') === -1 ) {
                         return i + ' ' + j;
@@ -62,8 +62,6 @@ var process = function (node) {
     });
 };
 
-module.exports = function () {
+module.exports = postcss.plugin('postcss-nested', function () {
     return process;
-};
-
-module.exports.postcss = process;
+});
