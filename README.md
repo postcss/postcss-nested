@@ -1,6 +1,8 @@
-# PostCSS Nested [![Build Status](https://travis-ci.org/postcss/postcss-nested.svg)](https://travis-ci.org/postcss/postcss-nested)
+# PostCSS Nested [![Build Status][ci-img]][ci]
 
-<img align="right" width="135" height="95" src="http://postcss.github.io/postcss/logo-leftp.png" title="Philosopher’s stone, logo of PostCSS">
+<img align="right" width="135" height="95"
+     title="Philosopher’s stone, logo of PostCSS"
+     src="http://postcss.github.io/postcss/logo-leftp.png">
 
 [PostCSS] plugin to unwrap nested rules like how Sass does it.
 
@@ -45,6 +47,8 @@ body.is_dark .phone_title {
 </a>
 
 [PostCSS]: https://github.com/postcss/postcss
+[ci-img]:  https://travis-ci.org/postcss/postcss-nested.svg
+[ci]:      https://travis-ci.org/postcss/postcss-nested
 
 ## Usage
 
