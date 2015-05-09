@@ -1,3 +1,9 @@
+## 0.3
+* Do not unwrap custom at-rules.
+* Add `bubble` option to unwrap some custom at-rules.
+* Support PostCSS 4.1 API.
+* Fix last semicolon after unwrapping.
+
 ## 0.2.2
 * Module returns function to have common PostCSS API.
 
