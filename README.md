@@ -57,3 +57,14 @@ postcss([ require('postcss-nested') ])
 ```
 
 See [PostCSS] docs for examples for your environment.
+
+## Options
+
+### `bubble`
+
+By default, plugin will unwrap only `@media`, `@support` and `@document`
+at-rules. You can add your custom at-rules to this list by `bubble` option:
+
+```js
+postcss([ require('postcss-nested')({ bubble: ['phone'] }) ]
+```

@@ -31,7 +31,7 @@ var atruleChilds = function (rule, atrule) {
     }
 };
 
-var processRule = function (rule) {
+var processRule = function (rule, bubble) {
     var unwrapped = false;
     var after     = rule;
     rule.each(function (child) {
@@ -40,9 +40,11 @@ var processRule = function (rule) {
             child.selector = selector(rule, child);
             after = child.moveAfter(after);
         } else if ( child.type === 'atrule' ) {
-            unwrapped = true;
-            atruleChilds(rule, child);
-            after = child.moveAfter(after);
+            if ( bubble.indexOf(child.name) !== -1 ) {
+                unwrapped = true;
+                atruleChilds(rule, child);
+                after = child.moveAfter(after);
+            }
         }
     });
     if ( unwrapped ) {
@@ -54,16 +56,18 @@ var processRule = function (rule) {
     }
 };
 
-var process = function (node) {
-    node.each(function (child) {
-        if ( child.type === 'rule' ) {
-            processRule(child);
-        } else if ( child.type === 'atrule' ) {
-            process(child);
-        }
-    });
-};
+module.exports = postcss.plugin('postcss-nested', function (opts) {
+    var bubble = ['media', 'support', 'document'];
+    if ( opts && opts.bubble ) bubble = bubble.concat(opts.bubble);
 
-module.exports = postcss.plugin('postcss-nested', function () {
+    var process = function (node) {
+        node.each(function (child) {
+            if ( child.type === 'rule' ) {
+                processRule(child, bubble);
+            } else if ( child.type === 'atrule' ) {
+                process(child);
+            }
+        });
+    };
     return process;
 });

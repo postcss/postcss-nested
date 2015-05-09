@@ -2,9 +2,8 @@ var postcss = require('postcss');
 var nested  = require('../');
 var expect  = require('chai').expect;
 
-var processor = postcss(nested);
-
-var check = function (input, output) {
+var check = function (input, output, opts) {
+    var processor = postcss([ nested(opts) ]);
     expect( processor.process(input).css ).to.equal(output);
 };
 
@@ -53,6 +52,12 @@ describe('postcss-nested', function () {
     it('unwraps at-rules', function () {
         check('a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
               'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }');
+    });
+
+    it('do not move custom at-rules', function () {
+        check('.one { @mixin test; } .two { @phone { color: black } }',
+              '.one { @mixin test; } @phone { .two { color: black } }',
+              { bubble: ['phone'] });
     });
 
     it('processes comma', function () {
