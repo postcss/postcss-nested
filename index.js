@@ -13,7 +13,6 @@ var selector = function (parent, node) {
 };
 
 var atruleChilds = function (rule, atrule) {
-    var clone;
     var decls = [];
     atrule.each(function (child) {
         if ( child.type === 'decl' ) {
@@ -25,7 +24,7 @@ var atruleChilds = function (rule, atrule) {
         }
     });
     if ( decls.length ) {
-        clone = rule.clone({ nodes: [] });
+        var clone = rule.clone({ nodes: [] });
         for ( var i = 0; i < decls.length; i++ ) decls[i].moveTo(clone);
         atrule.prepend(clone);
     }
@@ -48,11 +47,8 @@ var processRule = function (rule, bubble) {
         }
     });
     if ( unwrapped ) {
-        if ( rule.nodes.length === 0 ) {
-            rule.removeSelf();
-        } else {
-            rule.semicolon = true;
-        }
+        rule.semicolon = true;
+        if ( rule.nodes.length === 0 ) rule.removeSelf();
     }
 };
 
