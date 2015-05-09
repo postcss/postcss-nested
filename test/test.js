@@ -60,6 +60,12 @@ describe('postcss-nested', function () {
               { bubble: ['phone'] });
     });
 
+    it('supports bubble option with at-name', function () {
+        check('a { @phone { color: black } }',
+              '@phone {\n    a {\n        color: black\n    }\n}',
+              { bubble: ['@phone'] });
+    });
+
     it('processes comma', function () {
         check('.one, .two { a {} }',
               '.one a, .two a {}');
