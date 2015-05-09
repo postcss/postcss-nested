@@ -102,9 +102,4 @@ describe('postcss-nested', function () {
         check(input, output);
     });
 
-    it('works as function', function() {
-        var process = postcss(nested());
-        expect( process.process('a { b {} }').css ).to.equal('a b {}');
-    });
-
 });
