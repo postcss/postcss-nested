@@ -1,6 +1,6 @@
 {
     "name": "postcss-nested",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "PostCSS plugin to unwrap nested rules like how Sass does it.",
     "keywords": ["postcss", "css", "postcss-plugin", "sass", "nested"],
     "author": "Andrey Sitnik <andrey@sitnik.ru>",

@@ -1,3 +1,6 @@
+## 0.3.2
+* Fix `@supports` at-rule support (by Ben Briggs).
+
 ## 0.3.1
 * Pass PostCSS Plugin Guidelines.
 
