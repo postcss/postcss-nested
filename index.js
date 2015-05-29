@@ -53,7 +53,7 @@ var processRule = function (rule, bubble) {
 };
 
 module.exports = postcss.plugin('postcss-nested', function (opts) {
-    var bubble = ['media', 'support', 'document'];
+    var bubble = ['media', 'supports', 'document'];
     if ( opts && opts.bubble ) {
         bubble = bubble.concat(opts.bubble.map(function (i) {
             return i.replace(/^@/, '');
