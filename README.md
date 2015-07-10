@@ -44,14 +44,17 @@ body.is_dark .phone_title {
 
 See also [postcss-nesting] with tabakins proposal syntax with extra `{`.
 
+There is also [postcss-nested-props] for nested properties like `font-size`.
+
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
 
-[postcss-nesting]: https://github.com/jonathantneal/postcss-nesting
-[PostCSS]:         https://github.com/postcss/postcss
-[ci-img]:          https://travis-ci.org/postcss/postcss-nested.svg
-[ci]:              https://travis-ci.org/postcss/postcss-nested
+[postcss-nested-props]: https://github.com/jedmao/postcss-nested-props
+[postcss-nesting]:      https://github.com/jonathantneal/postcss-nesting
+[PostCSS]:              https://github.com/postcss/postcss
+[ci-img]:               https://travis-ci.org/postcss/postcss-nested.svg
+[ci]:                   https://travis-ci.org/postcss/postcss-nested
 
 ## Usage
 
