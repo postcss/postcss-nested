@@ -47,8 +47,8 @@ var processRule = function (rule, bubble) {
         }
     });
     if ( unwrapped ) {
-        rule.semicolon = true;
-        if ( rule.nodes.length === 0 ) rule.removeSelf();
+        rule.raws.semicolon = true;
+        if ( rule.nodes.length === 0 ) rule.remove();
     }
 };
 
