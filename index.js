@@ -1,6 +1,6 @@
 var postcss = require('postcss');
 
-var selectors = function (parent, node) {
+function selectors(parent, node) {
     var result = [];
     parent.selectors.forEach(function (i) {
         node.selectors.forEach(function (j) {
@@ -12,38 +12,50 @@ var selectors = function (parent, node) {
         });
     });
     return result;
-};
+}
 
-var atruleChilds = function (rule, atrule) {
-    var decls = [];
+function pickComment(comment, after) {
+    if ( comment && comment.type === 'comment' ) {
+        return comment.moveAfter(after);
+    } else {
+        return after;
+    }
+}
+
+function atruleChilds(rule, atrule) {
+    var children = [];
     atrule.each(function (child) {
-        if ( child.type === 'decl' ) {
-            decls.push( child );
+        if ( child.type === 'comment' ) {
+            children.push( child );
+        } if ( child.type === 'decl' ) {
+            children.push( child );
         } else if ( child.type === 'rule' ) {
             child.selectors = selectors(rule, child);
         } else if ( child.type === 'atrule' ) {
             atruleChilds(rule, child);
         }
     });
-    if ( decls.length ) {
+    if ( children.length ) {
         var clone = rule.clone({ nodes: [] });
-        for ( var i = 0; i < decls.length; i++ ) decls[i].moveTo(clone);
+        for ( var i = 0; i < children.length; i++ ) children[i].moveTo(clone);
         atrule.prepend(clone);
     }
-};
+}
 
-var processRule = function (rule, bubble) {
+function processRule(rule, bubble) {
     var unwrapped = false;
     var after     = rule;
     rule.each(function (child) {
         if ( child.type === 'rule' ) {
             unwrapped = true;
             child.selectors = selectors(rule, child);
+            after = pickComment(child.prev(), after);
             after = child.moveAfter(after);
         } else if ( child.type === 'atrule' ) {
             if ( bubble.indexOf(child.name) !== -1 ) {
                 unwrapped = true;
                 atruleChilds(rule, child);
+                after = pickComment(child.prev(), after);
                 after = child.moveAfter(after);
             }
         }
@@ -52,7 +64,7 @@ var processRule = function (rule, bubble) {
         rule.raws.semicolon = true;
         if ( rule.nodes.length === 0 ) rule.remove();
     }
-};
+}
 
 module.exports = postcss.plugin('postcss-nested', function (opts) {
     var bubble = ['media', 'supports', 'document'];

@@ -81,6 +81,21 @@ describe('postcss-nested', function () {
               'a .one, a .two, b .one, b .two {}');
     });
 
+    it('moves comment with rule', function () {
+        check('a {\n    /*B*/\n    b {}\n}',
+              '/*B*/\na b {}');
+    });
+
+    it('moves comment with at-rule', function () {
+        check('a {\n    /*B*/\n    @media {\n        one: 1\n    }\n}',
+              '/*B*/\n@media {\n    a {\n        one: 1\n    }\n}');
+    });
+
+    it('moves comment with declaration', function () {
+        check('a {\n    @media {\n        /*B*/\n        one: 1\n    }\n}',
+              '@media {\n    a {\n        /*B*/\n        one: 1\n    }\n}');
+    });
+
     it('parses example', function () {
         var input =  '.phone {\n' +
                      '    &_title {\n' +
