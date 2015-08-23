@@ -1,3 +1,8 @@
+## 1.0
+* Use PostCSS 5.0 API.
+* Do not add spaces to selector in compressed CSS.
+* Move nodes with its comment above.
+
 ## 0.3.2
 * Fix `@supports` at-rule support (by Ben Briggs).
 
