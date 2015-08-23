@@ -1,15 +1,17 @@
 var postcss = require('postcss');
 
-var selector = function (parent, node) {
-    return parent.selectors.map(function (i) {
-        return node.selectors.map(function (j) {
+var selectors = function (parent, node) {
+    var result = [];
+    parent.selectors.forEach(function (i) {
+        node.selectors.forEach(function (j) {
             if ( j.indexOf('&') === -1 ) {
-                return i + ' ' + j;
+                result.push(i + ' ' + j);
             } else {
-                return j.replace(/&/g, i);
+                result.push(j.replace(/&/g, i));
             }
-        }).join(', ');
-    }).join(', ');
+        });
+    });
+    return result;
 };
 
 var atruleChilds = function (rule, atrule) {
@@ -18,7 +20,7 @@ var atruleChilds = function (rule, atrule) {
         if ( child.type === 'decl' ) {
             decls.push( child );
         } else if ( child.type === 'rule' ) {
-            child.selector = selector(rule, child);
+            child.selectors = selectors(rule, child);
         } else if ( child.type === 'atrule' ) {
             atruleChilds(rule, child);
         }
@@ -36,7 +38,7 @@ var processRule = function (rule, bubble) {
     rule.each(function (child) {
         if ( child.type === 'rule' ) {
             unwrapped = true;
-            child.selector = selector(rule, child);
+            child.selectors = selectors(rule, child);
             after = child.moveAfter(after);
         } else if ( child.type === 'atrule' ) {
             if ( bubble.indexOf(child.name) !== -1 ) {
