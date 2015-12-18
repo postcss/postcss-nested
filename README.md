@@ -42,6 +42,9 @@ body.is_dark .phone_title {
 }
 ```
 
+Use [postcss-current-selector] after this plugin if you want to use
+urrent selector in properties or variables values.
+
 See also [postcss-nesting] with tabakins proposal syntax with extra `{`.
 
 There is also [postcss-nested-props] for nested properties like `font-size`.
@@ -50,11 +53,12 @@ There is also [postcss-nested-props] for nested properties like `font-size`.
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
 
-[postcss-nested-props]: https://github.com/jedmao/postcss-nested-props
-[postcss-nesting]:      https://github.com/jonathantneal/postcss-nesting
-[PostCSS]:              https://github.com/postcss/postcss
-[ci-img]:               https://travis-ci.org/postcss/postcss-nested.svg
-[ci]:                   https://travis-ci.org/postcss/postcss-nested
+[postcss-current-selector]: https://github.com/komlev/postcss-current-selector
+[postcss-nested-props]:     https://github.com/jedmao/postcss-nested-props
+[postcss-nesting]:          https://github.com/jonathantneal/postcss-nesting
+[PostCSS]:                  https://github.com/postcss/postcss
+[ci-img]:                   https://travis-ci.org/postcss/postcss-nested.svg
+[ci]:                       https://travis-ci.org/postcss/postcss-nested
 
 ## Usage
 
