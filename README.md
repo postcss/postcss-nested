@@ -43,7 +43,7 @@ body.is_dark .phone_title {
 ```
 
 Use [postcss-current-selector] after this plugin if you want to use
-urrent selector in properties or variables values.
+current selector in properties or variables values.
 
 See also [postcss-nesting], which implements [Tab Atkin's proposed syntax](https://tabatkins.github.io/specs/css-nesting/) (requires the `&` and introduces `@nest`).
 
