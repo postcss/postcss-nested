@@ -96,6 +96,11 @@ describe('postcss-nested', function () {
               '@media {\n    a {\n        /*B*/\n        one: 1\n    }\n}');
     });
 
+    it('unwrap rules inside rules with adjacent selector and &', function () {
+        check('.parent { .adjacent { &-left+&-right { margin: 0; } } }',
+              '.parent .adjacent-left+.adjacent-right {\n    margin: 0;\n}');
+    });
+
     it('parses example', function () {
         var input =  '.phone {\n' +
                      '    &_title {\n' +

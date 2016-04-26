@@ -7,7 +7,9 @@ function selectors(parent, node) {
             if ( j.indexOf('&') === -1 ) {
                 result.push(i + ' ' + j);
             } else {
-                result.push(j.replace(/&/g, i));
+                result.push(j.replace('&', i)
+                            .replace(/&/g, postcss.list.space(i).pop())
+                );
             }
         });
     });
