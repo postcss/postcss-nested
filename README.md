@@ -42,8 +42,9 @@ body.is_dark .phone_title {
 }
 ```
 
-Use [postcss-current-selector] after this plugin if you want to use
-current selector in properties or variables values.
+Use [postcss-current-selector] **after** this plugin if you want to use current selector in properties or variables values.
+
+Use [postcss-nested-ancestors] **before** this plugin if you want to reference any ancestor element directly in your selectors with `^&`.
 
 See also [postcss-nesting], which implements [Tab Atkin's proposed syntax](https://tabatkins.github.io/specs/css-nesting/) (requires the `&` and introduces `@nest`).
 
@@ -54,6 +55,7 @@ There is also [postcss-nested-props] for nested properties like `font-size`.
 </a>
 
 [postcss-current-selector]: https://github.com/komlev/postcss-current-selector
+[postcss-nested-ancestors]: https://github.com/toomuchdesign/postcss-nested-ancestors
 [postcss-nested-props]:     https://github.com/jedmao/postcss-nested-props
 [postcss-nesting]:          https://github.com/jonathantneal/postcss-nesting
 [PostCSS]:                  https://github.com/postcss/postcss
