@@ -54,6 +54,11 @@ describe('postcss-nested', function () {
               'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }');
     });
 
+    it('handles one line at-rules', function () {
+        check('a { @media screen { @include b; } }',
+              '@media screen {\n    a {\n        @include b\n    }\n}');
+    });
+
     it('do not move custom at-rules', function () {
         check('.one { @mixin test; } .two { @phone { color: black } }',
               '.one { @mixin test; } @phone { .two { color: black } }',
