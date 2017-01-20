@@ -31,8 +31,12 @@ function atruleChilds(rule, atrule) {
             children.push( child );
         } else if ( child.type === 'rule' ) {
             child.selectors = selectors(rule, child);
-        } else if ( child.type === 'atrule' ) {
-            atruleChilds(rule, child);
+        } else if ( child.type === 'atrule') {
+            if (/include/.test(child.name) && !child.nodes) {
+                children.push(child);
+            } else {
+                atruleChilds(rule, child);
+            }
         }
     });
     if ( children.length ) {
