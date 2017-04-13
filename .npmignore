@@ -1,10 +1,8 @@
 .gitignore
-.npmignore
+.editorconfig
 
 node_modules/
 npm-debug.log
 
-test/
+*.test.js
 .travis.yml
-
-gulpfile.js

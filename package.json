@@ -11,21 +11,22 @@
   ],
   "author": "Andrey Sitnik <andrey@sitnik.ru>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url":  "https://github.com/postcss/postcss-nested.git"
-  },
+  "repository": "postcss/postcss-nested",
   "dependencies": {
-    "postcss": "^5.0.2"
+    "postcss": "^5.2.17"
   },
   "devDependencies": {
-    "gulp-eslint": "1.0.0",
-    "gulp-mocha":  "2.1.3",
-    "mocha":       "2.2.5",
-    "chai":        "3.2.0",
-    "gulp":        "3.9.0"
+    "eslint": "^3.12.2",
+    "eslint-config-postcss": "^2.0.2",
+    "jest": "^18.0.0"
   },
   "scripts": {
-    "test": "gulp"
+    "test": "jest && eslint *.js"
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-postcss/es5",
+    "env": {
+      "jest": true
+    }
   }
 }
