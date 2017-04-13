@@ -1,3 +1,6 @@
+## 1.0.1
+* Clean up npm package.
+
 ## 1.0
 * Use PostCSS 5.0 API.
 * Do not add spaces to selector in compressed CSS.
