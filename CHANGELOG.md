@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.1
+* Fix rules order regression (by Dmitry Vibe).
+
 ## 2.0
 * Use PostCSS 6 API.
 
