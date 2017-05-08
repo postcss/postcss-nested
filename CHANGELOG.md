@@ -1,3 +1,6 @@
+## 2.0
+* Use PostCSS 6 API.
+
 ## 1.0.1
 * Clean up npm package.
 
