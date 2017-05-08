@@ -16,7 +16,7 @@ function selectors(parent, node) {
 
 function pickComment(comment, after) {
     if ( comment && comment.type === 'comment' ) {
-        return comment.moveAfter(after);
+        return after.after(comment);
     } else {
         return after;
     }
@@ -37,7 +37,9 @@ function atruleChilds(rule, atrule) {
     });
     if ( children.length ) {
         var clone = rule.clone({ nodes: [] });
-        for ( var i = 0; i < children.length; i++ ) children[i].moveTo(clone);
+        for ( var i = 0; i < children.length; i++ ) {
+            clone.append(children[i]);
+        }
         atrule.prepend(clone);
     }
 }
@@ -50,13 +52,13 @@ function processRule(rule, bubble) {
             unwrapped = true;
             child.selectors = selectors(rule, child);
             after = pickComment(child.prev(), after);
-            after = child.moveAfter(after);
+            after.after(child);
         } else if ( child.type === 'atrule' ) {
             if ( bubble.indexOf(child.name) !== -1 ) {
                 unwrapped = true;
                 atruleChilds(rule, child);
                 after = pickComment(child.prev(), after);
-                after = child.moveAfter(after);
+                after.after(child);
             }
         }
     });
