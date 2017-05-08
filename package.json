@@ -20,8 +20,15 @@
     "eslint-config-postcss": "^2.0.2",
     "jest": "^20.0.0"
   },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "statements": 100
+      }
+    }
+  },
   "scripts": {
-    "test": "jest && eslint *.js"
+    "test": "jest --coverage && eslint *.js"
   },
   "eslintConfig": {
     "extends": "eslint-config-postcss/es5",
