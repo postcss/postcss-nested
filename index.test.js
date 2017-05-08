@@ -128,3 +128,8 @@ it('parses example', () => {
                  '}';
     run(input, output);
 });
+
+it('saves order of rules', () => {
+    run('.one { & .two {} & .tree {} }',
+        '.one .two {} .one .tree {}');
+});
