@@ -53,12 +53,14 @@ function processRule(rule, bubble) {
             child.selectors = selectors(rule, child);
             after = pickComment(child.prev(), after);
             after.after(child);
+            after = child;
         } else if ( child.type === 'atrule' ) {
             if ( bubble.indexOf(child.name) !== -1 ) {
                 unwrapped = true;
                 atruleChilds(rule, child);
                 after = pickComment(child.prev(), after);
                 after.after(child);
+                after = child;
             }
         }
     });
