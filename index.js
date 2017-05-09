@@ -16,7 +16,8 @@ function selectors(parent, node) {
 
 function pickComment(comment, after) {
     if ( comment && comment.type === 'comment' ) {
-        return after.after(comment);
+        after.after(comment);
+        return comment;
     } else {
         return after;
     }
