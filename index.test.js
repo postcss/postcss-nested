@@ -101,3 +101,10 @@ it('saves order of rules', () => {
     return run('.one { & .two {} & .tree {} }',
                '.one .two {} .one .tree {}');
 });
+
+it('Doesn\'t replace ampersand inside attribute selectors', () => {
+    return run(
+        'div { &[data-category="sound & vision"] {} }',
+        'div[data-category="sound & vision"] {}'
+    );
+});
