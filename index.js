@@ -1,29 +1,17 @@
 var postcss = require('postcss');
-var selectorParser = require('postcss-selector-parser');
-var selectorProcessor = selectorParser();
+var parser = require('postcss-selector-parser');
 
-function parseSelector(selector) {
-    // Parse selector and get root's only child
-    return selectorProcessor.process(selector).res.first;
-}
-
-/**
- * Concatinates nested selectors. Expects arguments to be
- * selector nodes returned from postcss-selector-parser
- */
-function concatNested(selector, parentSelector) {
+function concatNested(selector, parent) {
     var replaced = false;
 
-    // Look for ampersand using postcss-selector-parser
     selector.walkNesting(function (ampersand) {
-        ampersand.replaceWith(parentSelector.clone());
+        ampersand.replaceWith(parent.clone());
         replaced = true;
     });
 
     if (!replaced) {
-        // If not found, join with a decendant combinator
-        selector.prepend(selectorParser.combinator({ value: ' ' }));
-        selector.prepend(parentSelector.clone());
+        selector.prepend(parser.combinator({ value: ' ' }));
+        selector.prepend(parent.clone());
     }
 
     return selector;
@@ -32,10 +20,10 @@ function concatNested(selector, parentSelector) {
 function selectors(parent, node) {
     var result = [];
     parent.selectors.forEach(function (i) {
-        var parentParsed = parseSelector(i);
+        var parsed = parser().process(i).res.first;
 
         node.selectors.forEach(function (j) {
-            result.push(concatNested(parseSelector(j), parentParsed));
+            result.push(concatNested(parser().process(j).res.first, parsed));
         });
     });
     return result;
