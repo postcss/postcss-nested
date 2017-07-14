@@ -3,8 +3,8 @@ var parser = require('postcss-selector-parser');
 
 function concatNested(selector, parent) {
     var replaced = false;
-
-    selector.walkNesting(function (ampersand) {
+    var nestingNodes = selector.nodes.filter(node => node.type === 'nesting');
+    nestingNodes.forEach(ampersand => {
         ampersand.replaceWith(parent.clone());
         replaced = true;
     });
