@@ -125,3 +125,9 @@ it('does not replace ampersand inside string', () => {
         'div { &[data-category="sound & vision"] {} }',
         'div[data-category="sound & vision"] {}');
 });
+
+it('should replace ampersand in adjacent sibling selector', () => {
+    return run(
+        'div { & + & {} }',
+        'div + div {}');
+});
