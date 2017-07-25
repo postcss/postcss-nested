@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1
+* Add `preserveEmpty` option (by Federico Zivolo).
+
 ## 2.0.4
 * Fix finding `&` in some selectors (by Stepan Mikhaylyuk).
 
