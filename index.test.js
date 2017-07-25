@@ -22,6 +22,12 @@ it('cleans rules after unwrap', () => {
         'a b .one {} a b .two {}');
 });
 
+it('preserve empty rules if preserveEmpty is set to true', () => {
+    return run(
+        'a { b .one {} b .two {} }',
+        'a { } a b .one {} a b .two {}', { preserveEmpty: true });
+});
+
 it('replaces ampersand', () => {
     return run(
         'a { body &:hover b {} }',

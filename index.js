@@ -60,7 +60,7 @@ function atruleChilds(rule, atrule) {
     }
 }
 
-function processRule(rule, bubble) {
+function processRule(rule, bubble, preserveEmpty) {
     var unwrapped = false;
     var after     = rule;
     rule.each(function (child) {
@@ -80,7 +80,7 @@ function processRule(rule, bubble) {
             }
         }
     });
-    if ( unwrapped ) {
+    if ( unwrapped && preserveEmpty !== true ) {
         rule.raws.semicolon = true;
         if ( rule.nodes.length === 0 ) rule.remove();
     }
@@ -93,11 +93,12 @@ module.exports = postcss.plugin('postcss-nested', function (opts) {
             return i.replace(/^@/, '');
         }));
     }
+    var preserveEmpty = opts ? opts.preserveEmpty : false;
 
     var process = function (node) {
         node.each(function (child) {
             if ( child.type === 'rule' ) {
-                processRule(child, bubble);
+                processRule(child, bubble, preserveEmpty);
             } else if ( child.type === 'atrule' ) {
                 process(child);
             }
