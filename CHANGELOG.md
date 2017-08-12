@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.1
+* Fix `:not(&)` support.
+
 ## 2.1
 * Add `preserveEmpty` option (by Federico Zivolo).
 
