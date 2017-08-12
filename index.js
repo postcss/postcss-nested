@@ -1,29 +1,32 @@
 var postcss = require('postcss');
 var parser = require('postcss-selector-parser');
 
-function concatNested(selector, parent) {
+function replace(nodes, parent) {
     var replaced = false;
-    var nestingNodes = selector.nodes.filter(node => node.type === 'nesting');
-    nestingNodes.forEach(ampersand => {
-        ampersand.replaceWith(parent.clone());
-        replaced = true;
+    nodes.forEach(function (i) {
+        if (i.type === 'nesting') {
+            i.replaceWith(parent.clone());
+            replaced = true;
+        } else if (i.nodes) {
+            replaced = replaced || replace(i.nodes, parent);
+        }
     });
-
-    if (!replaced) {
-        selector.prepend(parser.combinator({ value: ' ' }));
-        selector.prepend(parent.clone());
-    }
-
-    return selector;
+    return replaced;
 }
 
-function selectors(parent, node) {
+function selectors(parent, child) {
     var result = [];
     parent.selectors.forEach(function (i) {
-        var parsed = parser().process(i).res.first;
+        var parentNode = parser().process(i).res.first;
 
-        node.selectors.forEach(function (j) {
-            result.push(concatNested(parser().process(j).res.first, parsed));
+        child.selectors.forEach(function (j) {
+            var node = parser().process(j).res.first;
+            var replaced = replace(node.nodes, parentNode);
+            if (!replaced) {
+                node.prepend(parser.combinator({ value: ' ' }));
+                node.prepend(parentNode.clone());
+            }
+            result.push(node.toString());
         });
     });
     return result;
