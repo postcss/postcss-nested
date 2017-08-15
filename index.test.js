@@ -136,6 +136,6 @@ it('replaces ampersand in adjacent sibling selector', () => {
     return run('div { & + & {} }', 'div + div {}');
 });
 
-it('replaces ampersand in not selector', () => {
-    return run('div { :not(&) {} }', ':not(div) {}');
+it('replaces ampersands in not selector', () => {
+    return run('.a { &:not(&.no) {} }', '.a:not(.a.no) {}');
 });

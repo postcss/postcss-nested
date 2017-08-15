@@ -8,7 +8,9 @@ function replace(nodes, parent) {
             i.replaceWith(parent.clone());
             replaced = true;
         } else if (i.nodes) {
-            replaced = replaced || replace(i.nodes, parent);
+            if (replace(i.nodes, parent)) {
+                replaced = true;
+            }
         }
     });
     return replaced;
