@@ -56,6 +56,11 @@ function atruleChilds(rule, atrule) {
             atruleChilds(rule, child);
         }
     });
+    /*
+     * Bubble up font face to top level css and ignore nested selectors
+     */
+    if (atrule.name === 'font-face') return;
+
     if ( children.length ) {
         var clone = rule.clone({ nodes: [] });
         for ( var i = 0; i < children.length; i++ ) {
@@ -92,7 +97,7 @@ function processRule(rule, bubble, preserveEmpty) {
 }
 
 module.exports = postcss.plugin('postcss-nested', function (opts) {
-    var bubble = ['media', 'supports', 'document'];
+    var bubble = ['media', 'supports', 'document', 'font-face'];
     if ( opts && opts.bubble ) {
         bubble = bubble.concat(opts.bubble.map(function (i) {
             return i.replace(/^@/, '');

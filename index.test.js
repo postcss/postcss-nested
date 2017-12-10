@@ -64,6 +64,20 @@ it('unwraps at-rule with rules', () => {
         '@media screen { a b { color: black } }');
 });
 
+it('unwraps font-face to top level css', () => {
+    return run(
+        '.a { @font-face { font-family:font; src:url() format("woff"); } }',
+        '@font-face { font-family:font; src:url() format("woff"); }'
+    );
+});
+
+it('unwraps multiple fonts to top level css', () => {
+    return run(
+        '.a { @font-face { font-family:f1; } @font-face { font-family:f2; }}',
+        '@font-face { font-family:f1; } @font-face { font-family:f2; }'
+    );
+});
+
 it('unwraps at-rules', () => {
     return run(
         'a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
