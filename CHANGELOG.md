@@ -1,6 +1,11 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.0
+* Add `@font-face` to bubbling at-rules (by Valeriy Komlev).
+* Add special logic for `@font-face` bubbling (by Phanindra Pydisetty).
+* Use PostCSS selector parser 3.0.
+
 ## 2.1.2
 * Fix replacing multiple `&`.
 
