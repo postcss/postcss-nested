@@ -1,14 +1,23 @@
 var postcss = require('postcss');
 var parser = require('postcss-selector-parser');
 
+function parse(str) {
+    var nodes;
+    var saver = parser(function (parsed) {
+        nodes = parsed;
+    });
+    saver.processSync(str);
+    return nodes.at(0);
+}
+
 function replace(nodes, parent) {
     var replaced = false;
-    nodes.forEach(function (i) {
+    nodes.each(function (i) {
         if (i.type === 'nesting') {
             i.replaceWith(parent.clone());
             replaced = true;
         } else if (i.nodes) {
-            if (replace(i.nodes, parent)) {
+            if (replace(i, parent)) {
                 replaced = true;
             }
         }
@@ -19,11 +28,11 @@ function replace(nodes, parent) {
 function selectors(parent, child) {
     var result = [];
     parent.selectors.forEach(function (i) {
-        var parentNode = parser().process(i).res.first;
+        var parentNode = parse(i);
 
         child.selectors.forEach(function (j) {
-            var node = parser().process(j).res.first;
-            var replaced = replace(node.nodes, parentNode);
+            var node = parse(j);
+            var replaced = replace(node, parentNode);
             if (!replaced) {
                 node.prepend(parser.combinator({ value: ' ' }));
                 node.prepend(parentNode.clone());
