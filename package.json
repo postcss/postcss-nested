@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "eslint": "^4.4.1",
+    "eslint-ci": "^0.1.1",
     "eslint-config-postcss": "^2.0.2",
     "jest": "^20.0.4"
   },
@@ -29,8 +30,8 @@
     }
   },
   "scripts": {
-    "test": "jest --coverage && eslint *.js ",
-    "test:watch": "jest --coverage --watch && eslint *.js "
+    "test": "jest --coverage && eslint-ci *.js ",
+    "test:watch": "jest --coverage --watch && eslint-ci *.js "
   },
   "eslintConfig": {
     "extends": "eslint-config-postcss/es5",
