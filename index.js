@@ -56,6 +56,11 @@ function atruleChilds(rule, atrule) {
             atruleChilds(rule, child);
         }
     });
+    /*
+     * Bubble up font face to top level css and ignore nested selectors
+     */
+    if (atrule.name === 'font-face') return;
+
     if ( children.length ) {
         var clone = rule.clone({ nodes: [] });
         for ( var i = 0; i < children.length; i++ ) {

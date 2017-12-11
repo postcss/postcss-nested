@@ -29,7 +29,8 @@
     }
   },
   "scripts": {
-    "test": "jest --coverage && eslint *.js"
+    "test": "jest --coverage && eslint *.js ",
+    "test:watch": "jest --coverage --watch && eslint *.js "
   },
   "eslintConfig": {
     "extends": "eslint-config-postcss/es5",
