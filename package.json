@@ -30,8 +30,7 @@
     }
   },
   "scripts": {
-    "test": "jest --coverage && eslint-ci *.js ",
-    "test:watch": "jest --coverage --watch && eslint-ci *.js "
+    "test": "jest --coverage && eslint-ci *.js"
   },
   "eslintConfig": {
     "extends": "eslint-config-postcss/es5",
