@@ -74,7 +74,7 @@ See [PostCSS] docs for examples for your environment.
 
 ### `bubble`
 
-By default, plugin will unwrap only `@media`, `@supports`, `@font-face` and `@document
+By default, plugin will unwrap only `@media`, `@supports`, `@font-face` and `@document`
 at-rules. You can add your custom at-rules to this list by `bubble` option:
 
 ```js
