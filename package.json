@@ -13,21 +13,22 @@
   "license": "MIT",
   "repository": "postcss/postcss-nested",
   "dependencies": {
-    "postcss": "^6.0.14",
+    "postcss": "^7.0.2",
     "postcss-selector-parser": "^3.1.1"
   },
   "devDependencies": {
     "eslint": "^4.13.0",
     "eslint-ci": "^0.1.1",
     "eslint-config-postcss": "^2.0.2",
-    "jest": "^21.2.1"
+    "jest": "^23.4.2"
   },
   "jest": {
     "coverageThreshold": {
       "global": {
         "statements": 100
       }
-    }
+    },
+    "testEnvironment": "node"
   },
   "scripts": {
     "test": "jest --coverage && eslint-ci *.js"
