@@ -17,6 +17,7 @@
     "postcss-selector-parser": "^3.1.1"
   },
   "devDependencies": {
+    "clean-publish": "^1.0.10",
     "eslint": "^5.5.0",
     "eslint-ci": "^0.1.1",
     "eslint-config-logux": "^25.0.1",
