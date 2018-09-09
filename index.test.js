@@ -98,6 +98,19 @@ it('supports bubble option with at-name', function () {
     { bubble: ['@phone'] })
 })
 
+it('unwraps keyframes', function () {
+  return run(
+    'a { color: white; @keyframes name { to { color: black } } }',
+    'a { color: white; } @keyframes name { to { color: black } }')
+})
+
+it('supports unwrap option with at-name', function () {
+  return run(
+    'a { @phone { color: black } }',
+    '@phone { color: black }',
+    { unwrap: ['@phone'] })
+})
+
 it('processes comma', function () {
   return run(
     '.one, .two { a {} }',

@@ -74,11 +74,56 @@ See [PostCSS] docs for examples for your environment.
 
 ### `bubble`
 
-By default, plugin will unwrap only `@media`, `@supports`, `@font-face` and `@document`
-at-rules. You can add your custom at-rules to this list by `bubble` option:
+By default, plugin will bubble only `@media` and `@supports` at-rules.
+You can add your custom at-rules to this list by `bubble` option:
 
 ```js
 postcss([ require('postcss-nested')({ bubble: ['phone'] }) ])
+```
+
+```css
+/* input */
+a {
+  color: white;
+  @phone {
+    color: black;
+  }
+}
+/* output */
+a {
+  color: white;
+}
+@phone {
+  a {
+    color: black;
+  }
+}
+```
+
+### `unwrap`
+
+By default, plugin will unwrap only `@font-face`, `@keyframes` and `@document`
+at-rules. You can add your custom at-rules to this list by `unwrap` option:
+
+```js
+postcss([ require('postcss-nested')({ unwrap: ['phone'] }) ])
+```
+
+```css
+/* input */
+a {
+  color: white;
+  @phone {
+    color: black;
+  }
+}
+/* output */
+a {
+  color: white;
+}
+@phone {
+  color: black;
+}
 ```
 
 ### `preserveEmpty`

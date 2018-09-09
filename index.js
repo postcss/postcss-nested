@@ -52,31 +52,31 @@ function pickComment (comment, after) {
   }
 }
 
-function atruleChilds (rule, atrule) {
+function atruleChilds (rule, atrule, bubbling) {
   var children = []
   atrule.each(function (child) {
     if (child.type === 'comment') {
       children.push(child)
     } if (child.type === 'decl') {
       children.push(child)
-    } else if (child.type === 'rule') {
+    } else if (child.type === 'rule' && bubbling) {
       child.selectors = selectors(rule, child)
     } else if (child.type === 'atrule') {
-      atruleChilds(rule, child)
+      atruleChilds(rule, child, bubbling)
     }
   })
-  if (atrule.name === 'font-face') return
-
-  if (children.length) {
-    var clone = rule.clone({ nodes: [] })
-    for (var i = 0; i < children.length; i++) {
-      clone.append(children[i])
+  if (bubbling) {
+    if (children.length) {
+      var clone = rule.clone({ nodes: [] })
+      for (var i = 0; i < children.length; i++) {
+        clone.append(children[i])
+      }
+      atrule.prepend(clone)
     }
-    atrule.prepend(clone)
   }
 }
 
-function processRule (rule, bubble, preserveEmpty) {
+function processRule (rule, bubble, unwrap, preserveEmpty) {
   var unwrapped = false
   var after = rule
   rule.each(function (child) {
@@ -87,9 +87,15 @@ function processRule (rule, bubble, preserveEmpty) {
       after.after(child)
       after = child
     } else if (child.type === 'atrule') {
-      if (bubble.indexOf(child.name) !== -1) {
+      if (bubble[child.name]) {
         unwrapped = true
-        atruleChilds(rule, child)
+        atruleChilds(rule, child, true)
+        after = pickComment(child.prev(), after)
+        after.after(child)
+        after = child
+      } else if (unwrap[child.name]) {
+        unwrapped = true
+        atruleChilds(rule, child, false)
         after = pickComment(child.prev(), after)
         after.after(child)
         after = child
@@ -102,19 +108,31 @@ function processRule (rule, bubble, preserveEmpty) {
   }
 }
 
-module.exports = postcss.plugin('postcss-nested', function (opts) {
-  var bubble = ['media', 'supports', 'document', 'font-face']
-  if (opts && opts.bubble) {
-    bubble = bubble.concat(opts.bubble.map(function (i) {
-      return i.replace(/^@/, '')
-    }))
+function atruleNames (defaults, custom) {
+  var list = { }
+  var i, name
+  for (i = 0; i < defaults.length; i++) {
+    list[defaults[i]] = true
   }
+  if (custom) {
+    for (i = 0; i < custom.length; i++) {
+      name = custom[i].replace(/^@/, '')
+      list[name] = true
+    }
+  }
+  return list
+}
+
+module.exports = postcss.plugin('postcss-nested', function (opts) {
+  if (!opts) opts = { }
+  var bubble = atruleNames(['media', 'supports'], opts.bubble)
+  var unwrap = atruleNames(['document', 'font-face', 'keyframes'], opts.unwrap)
   var preserveEmpty = opts ? opts.preserveEmpty : false
 
   var process = function (node) {
     node.each(function (child) {
       if (child.type === 'rule') {
-        processRule(child, bubble, preserveEmpty)
+        processRule(child, bubble, unwrap, preserveEmpty)
       } else if (child.type === 'atrule') {
         process(child)
       }
