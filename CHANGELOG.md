@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.1
+* Add `unwrap` option.
+
 ## 4.0
 * Use PostCSS 7 (by Aleks Hudochenkov).
 * Remove Node.js 4 support.
