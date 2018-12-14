@@ -14,7 +14,16 @@ function replace (nodes, parent) {
   var replaced = false
   nodes.each(function (i) {
     if (i.type === 'nesting') {
-      i.replaceWith(parent.clone())
+      // clone the parent node
+      var clonedParent = parent.clone()
+      // if the current node has a nesting selector with params
+      var hasParameters = i.value.match(/&\((.*?)\)/)
+      if (hasParameters) {
+        // append the params to the last selector in the cloned parent
+        clonedParent.last.value += '(' + hasParameters[1] + ')'
+      }
+      // replace the current node with the parent
+      i.replaceWith(clonedParent)
       replaced = true
     } else if (i.nodes) {
       if (replace(i, parent)) {

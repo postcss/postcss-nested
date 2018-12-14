@@ -166,3 +166,7 @@ it('replaces ampersand in adjacent sibling selector', function () {
 it('replaces ampersands in not selector', function () {
   return run('.a { &:not(&.no) {} }', '.a:not(.a.no) {}')
 })
+
+it('handles :host selector case', function () {
+  return run(':host { &(:focus) {} }', ':host(:focus) {}')
+})
