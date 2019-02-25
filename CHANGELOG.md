@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.1.2
+* Improve error messsage on broken selector
+
 ## 4.1.1
 * Add `&(:hover)` support (by Ben Delarre).
 
