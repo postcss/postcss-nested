@@ -170,3 +170,17 @@ it('replaces ampersands in not selector', function () {
 it('handles :host selector case', function () {
   return run(':host { &(:focus) {} }', ':host(:focus) {}')
 })
+
+it('shows clear errors on missed semicolon', function () {
+  var css = 'a{\n  color: black\n  @mixin b { }\n}\n'
+  expect(function () {
+    css = postcss([plugin]).process(css, { from: undefined }).css
+  }).toThrowError('2:3: Missed semicolon')
+})
+
+it('shows clear errors on other errors', function () {
+  var css = 'a{\n  -Option/root { }\n}\n'
+  expect(function () {
+    css = postcss([plugin]).process(css, { from: undefined }).css
+  }).toThrowError(':2:3: Unexpected')
+})

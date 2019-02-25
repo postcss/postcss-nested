@@ -1,12 +1,20 @@
 var postcss = require('postcss')
 var parser = require('postcss-selector-parser')
 
-function parse (str) {
+function parse (str, rule) {
   var nodes
   var saver = parser(function (parsed) {
     nodes = parsed
   })
-  saver.processSync(str)
+  try {
+    saver.processSync(str)
+  } catch (e) {
+    if (str.indexOf(':') !== -1) {
+      throw rule ? rule.error('Missed semicolon') : e
+    } else {
+      throw rule ? rule.error(e.message) : e
+    }
+  }
   return nodes.at(0)
 }
 
@@ -33,10 +41,10 @@ function replace (nodes, parent) {
 function selectors (parent, child) {
   var result = []
   parent.selectors.forEach(function (i) {
-    var parentNode = parse(i)
+    var parentNode = parse(i, parent)
 
     child.selectors.forEach(function (j) {
-      var node = parse(j)
+      var node = parse(j, child)
       var replaced = replace(node, parentNode)
       if (!replaced) {
         node.prepend(parser.combinator({ value: ' ' }))
