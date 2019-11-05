@@ -70,8 +70,7 @@ function atruleChilds (rule, atrule, bubbling) {
   atrule.each(function (child) {
     if (child.type === 'comment') {
       children.push(child)
-    }
-    if (child.type === 'decl') {
+    } else if (child.type === 'decl') {
       children.push(child)
     } else if (child.type === 'rule' && bubbling) {
       child.selectors = selectors(rule, child)
@@ -139,7 +138,7 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
 }
 
 function atruleNames (defaults, custom) {
-  var list = {}
+  var list = { }
   var i, name
   for (i = 0; i < defaults.length; i++) {
     list[defaults[i]] = true
@@ -154,7 +153,7 @@ function atruleNames (defaults, custom) {
 }
 
 module.exports = postcss.plugin('postcss-nested', function (opts) {
-  if (!opts) opts = {}
+  if (!opts) opts = { }
   var bubble = atruleNames(['media', 'supports'], opts.bubble)
   var unwrap = atruleNames(['document', 'font-face', 'keyframes'], opts.unwrap)
   var preserveEmpty = opts ? opts.preserveEmpty : false
