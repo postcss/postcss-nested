@@ -9,6 +9,9 @@
     "sass",
     "nested"
   ],
+  "scripts": {
+    "test": "jest --coverage && eslint-ci *.js"
+  },
   "author": "Andrey Sitnik <andrey@sitnik.ru>",
   "license": "MIT",
   "repository": "postcss/postcss-nested",
@@ -41,9 +44,6 @@
       }
     },
     "testEnvironment": "node"
-  },
-  "scripts": {
-    "test": "jest --coverage && eslint-ci *.js"
   },
   "eslintConfig": {
     "extends": "eslint-config-postcss/es5",
