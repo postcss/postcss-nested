@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.2
+* Add `@at-root` support (by Jason Quense).
+
 ## 4.1.2
 * Improve error messsage on broken selector
 
