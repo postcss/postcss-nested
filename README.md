@@ -21,6 +21,15 @@
         display: block;
     }
 }
+
+.title {
+  font-size: var(--font);
+
+  @at-root html {
+      --font: 16px
+    }
+  }
+}
 ```
 
 will be processed to:
@@ -40,40 +49,12 @@ body.is_dark .phone_title {
 .phone img {
     display: block;
 }
-```
 
-For situations where you need to reference the root context for more complex nesting
-(or to avoid it completely), the Sass like `@at-root` rule can be used:
-
-```scss
 .title {
-    width: 500px;
-
-    @at-root {
-      .other {
-        color: red;
-      }
-    }
-    // this is shorthand for the above
-    @at-root .another {
-      height: 30rem;
-    }
+  font-size: var(--font);
 }
-```
-
-will result in:
-
-```scss
-.title {
-    width: 500px;
-}
-
-.other {
-    color: red;
-}
-
-.another {
-    height: 30rem;
+html {
+  --font: 16px
 }
 ```
 
