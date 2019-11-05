@@ -42,6 +42,41 @@ body.is_dark .phone_title {
 }
 ```
 
+For situations where you need to reference the root context for more complex nesting
+(or to avoid it completely), the Sass like `@at-root` rule can be used:
+
+```scss
+.title {
+    width: 500px;
+
+    @at-root {
+      .other {
+        color: red;
+      }
+    }
+    // this is shorthand for the above
+    @at-root .another {
+      height: 30rem;
+    }
+}
+```
+
+will result in:
+
+```scss
+.title {
+    width: 500px;
+}
+
+.other {
+    color: red;
+}
+
+.another {
+    height: 30rem;
+}
+```
+
 Use [postcss-current-selector] **after** this plugin if you want to use current selector in properties or variables values.
 
 Use [postcss-nested-ancestors] **before** this plugin if you want to reference any ancestor element directly in your selectors with `^&`.
