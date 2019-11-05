@@ -28,6 +28,18 @@ it('preserve empty rules if preserveEmpty is set to true', function () {
     'a { } a b .one {} a b .two {}', { preserveEmpty: true })
 })
 
+it('hoists at-root ', function () {
+  return run(
+    'a { & {} @at-root { b {} } }',
+    'a {} b {}')
+})
+
+it('at-root short hand ', function () {
+  return run(
+    'a { & {} @at-root b { } }',
+    'a {} b {}')
+})
+
 it('replaces ampersand', function () {
   return run(
     'a { body &:hover b {} }',
