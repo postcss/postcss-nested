@@ -1,4 +1,4 @@
-# PostCSS Nested [![Build Status][ci-img]][ci]
+# PostCSS Nested
 
 <img align="right" width="135" height="95"
      title="Philosopher’s stone, logo of PostCSS"
@@ -58,25 +58,29 @@ html {
 }
 ```
 
-Use [postcss-current-selector] **after** this plugin if you want to use current selector in properties or variables values.
+Related plugins:
 
-Use [postcss-nested-ancestors] **before** this plugin if you want to reference any ancestor element directly in your selectors with `^&`.
+* Use [`postcss-current-selector`] **after** this plugin if you want
+to use current selector in properties or variables values.
+* Use [`postcss-nested-ancestors`] **before** this plugin if you want
+to reference any ancestor element directly in your selectors with `^&`.
 
-See also [postcss-nesting], which implements [Tab Atkin's proposed syntax](https://tabatkins.github.io/specs/css-nesting/) (requires the `&` and introduces `@nest`).
+Alternatives:
 
-There is also [postcss-nested-props] for nested properties like `font-size`.
+* See also [`postcss-nesting`], which implements [CSSWG draft]
+  (requires the `&` and introduces `@nest`).
+* [`postcss-nested-props`] for nested properties like `font-size`.
 
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
 
-[postcss-current-selector]: https://github.com/komlev/postcss-current-selector
-[postcss-nested-ancestors]: https://github.com/toomuchdesign/postcss-nested-ancestors
-[postcss-nested-props]:     https://github.com/jedmao/postcss-nested-props
-[postcss-nesting]:          https://github.com/jonathantneal/postcss-nesting
+[`postcss-current-selector`]: https://github.com/komlev/postcss-current-selector
+[`postcss-nested-ancestors`]: https://github.com/toomuchdesign/postcss-nested-ancestors
+[`postcss-nested-props`]:     https://github.com/jedmao/postcss-nested-props
+[`postcss-nesting`]:          https://github.com/jonathantneal/postcss-nesting
+[CSSWG draft]:              https://drafts.csswg.org/css-nesting-1/
 [PostCSS]:                  https://github.com/postcss/postcss
-[ci-img]:                   https://travis-ci.org/postcss/postcss-nested.svg
-[ci]:                       https://travis-ci.org/postcss/postcss-nested
 
 ## Usage
 
