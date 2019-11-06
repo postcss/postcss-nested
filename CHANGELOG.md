@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.2.1
+* Fix TypeScript definitions (by Avi Vahl).
+
 ## 4.2
 * Add `@at-root` support (by Jason Quense).
 
