@@ -89,18 +89,42 @@ function atruleChilds (rule, atrule, bubbling) {
   }
 }
 
+function pickDeclarations (selector, declarations, after) {
+  var parent = postcss.rule({
+    selector: selector,
+    nodes: []
+  })
+
+  for (var i = 0; i < declarations.length; i++) {
+    parent.append(declarations[i])
+  }
+
+  after.after(parent)
+  return parent
+}
+
 function processRule (rule, bubble, unwrap, preserveEmpty) {
   var unwrapped = false
   var after = rule
+  var copyDeclarations = false
+  var declarations = []
 
   rule.each(function (child) {
     if (child.type === 'rule') {
+      if (declarations.length) {
+        after = pickDeclarations(rule.selector, declarations, after)
+        declarations = []
+      }
+
+      copyDeclarations = true
       unwrapped = true
       child.selectors = selectors(rule, child)
       after = pickComment(child.prev(), after)
       after.after(child)
       after = child
     } else if (child.type === 'atrule') {
+      copyDeclarations = false
+
       if (child.name === 'at-root') {
         unwrapped = true
         atruleChilds(rule, child, false)
@@ -129,8 +153,15 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
         after.after(child)
         after = child
       }
+    } else if (child.type === 'decl' && copyDeclarations) {
+      declarations.push(child)
     }
   })
+
+  if (declarations.length) {
+    after = pickDeclarations(rule.selector, declarations, after)
+  }
+
   if (unwrapped && preserveEmpty !== true) {
     rule.raws.semicolon = true
     if (rule.nodes.length === 0) rule.remove()

@@ -186,6 +186,13 @@ it('saves order of rules', () => {
   )
 })
 
+it('copy rule for declarations after nested rule', () => {
+  return run(
+    'a { a: 1; &b { b: 2 } c: 1; &c { d: 5 } e: 6 } c { f: 1 }',
+    'a { a: 1; } ab { b: 2 } a { c: 1; } ac { d: 5 } a { e: 6; } c { f: 1 }'
+  )
+})
+
 it('does not replace ampersand inside string', () => {
   return run(
     'div { &[data-category="sound & vision"] {} }',
