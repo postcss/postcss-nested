@@ -193,6 +193,13 @@ it('copies rule for declarations after nested rule', () => {
   )
 })
 
+it('copies rule for declarations after nested rule and before at-rule', () => {
+  return run(
+    'a { &b { a: 1 } b: 2; @media { c: 3 } }',
+    'ab { a: 1 } a { b: 2 } @media {a { c: 3 } }'
+  )
+})
+
 it('does not replace ampersand inside string', () => {
   return run(
     'div { &[data-category="sound & vision"] {} }',
