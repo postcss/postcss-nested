@@ -125,6 +125,11 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
     } else if (child.type === 'atrule') {
       copyDeclarations = false
 
+      if (declarations.length) {
+        after = pickDeclarations(rule.selector, declarations, after)
+        declarations = []
+      }
+
       if (child.name === 'at-root') {
         unwrapped = true
         atruleChilds(rule, child, false)
