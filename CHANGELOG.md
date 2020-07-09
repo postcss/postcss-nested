@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.2.3
+* Fixed declarations after nested rule and before at-rule (by Rodion Demikhov).
+
 ## 4.2.2
 * Fixed wrong specificity order of declarations (by Rodion Demikhov).
 
