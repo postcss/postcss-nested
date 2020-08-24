@@ -2,7 +2,7 @@
 
 <img align="right" width="135" height="95"
      title="Philosopher’s stone, logo of PostCSS"
-     src="http://postcss.github.io/postcss/logo-leftp.svg">
+     src="https://postcss.org/logo-leftp.svg">
 
 [PostCSS] plugin to unwrap nested rules like how Sass does it.
 
@@ -72,7 +72,8 @@ Alternatives:
 * [`postcss-nested-props`] for nested properties like `font-size`.
 
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
-<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
+  <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg"
+       alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
 
 [`postcss-current-selector`]: https://github.com/komlev/postcss-current-selector
@@ -82,13 +83,29 @@ Alternatives:
 [CSSWG draft]:              https://drafts.csswg.org/css-nesting-1/
 [PostCSS]:                  https://github.com/postcss/postcss
 
+
 ## Usage
 
-```js
-postcss([ require('postcss-nested') ])
+**Step 1:** Check you project for existed PostCSS config: `postcss.config.js`
+in the project root, `"postcss"` section in `package.json`
+or `postcss` in bundle config.
+
+If you do not use PostCSS, add it according to [official docs]
+and set this plugin in settings.
+
+**Step 2:** Add the plugin to plugins list:
+
+```diff
+module.exports = {
+  plugins: [
++   require('postcss-nested'),
+    require('autoprefixer')
+  ]
+}
 ```
 
-See [PostCSS] docs for examples for your environment.
+[official docs]: https://github.com/postcss/postcss#usage
+
 
 ## Options
 
@@ -120,6 +137,7 @@ a {
 }
 ```
 
+
 ### `unwrap`
 
 By default, plugin will unwrap only `@font-face`, `@keyframes` and `@document`
@@ -145,6 +163,7 @@ a {
   color: black;
 }
 ```
+
 
 ### `preserveEmpty`
 

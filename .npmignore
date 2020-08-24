@@ -1,9 +1,5 @@
-.editorconfig
-
-node_modules/
-npm-debug.log
+yarn-error.log
 yarn.lock
 
-coverage/
 *.test.js
-.travis.yml
+coverage/

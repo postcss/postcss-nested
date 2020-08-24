@@ -1,15 +1,14 @@
-var postcss = require('postcss')
-var parser = require('postcss-selector-parser')
+let parser = require('postcss-selector-parser')
 
 function parse (str, rule) {
-  var nodes
-  var saver = parser(function (parsed) {
+  let nodes
+  let saver = parser(parsed => {
     nodes = parsed
   })
   try {
     saver.processSync(str)
   } catch (e) {
-    if (str.indexOf(':') !== -1) {
+    if (str.includes(':')) {
       throw rule ? rule.error('Missed semicolon') : e
     } else {
       throw rule ? rule.error(e.message) : e
@@ -19,10 +18,10 @@ function parse (str, rule) {
 }
 
 function replace (nodes, parent) {
-  var replaced = false
-  nodes.each(function (i) {
+  let replaced = false
+  nodes.each(i => {
     if (i.type === 'nesting') {
-      var clonedParent = parent.clone()
+      let clonedParent = parent.clone()
       if (i.value !== '&') {
         i.replaceWith(parse(i.value.replace('&', clonedParent.toString())))
       } else {
@@ -39,13 +38,13 @@ function replace (nodes, parent) {
 }
 
 function selectors (parent, child) {
-  var result = []
-  parent.selectors.forEach(function (i) {
-    var parentNode = parse(i, parent)
+  let result = []
+  parent.selectors.forEach(i => {
+    let parentNode = parse(i, parent)
 
-    child.selectors.forEach(function (j) {
-      var node = parse(j, child)
-      var replaced = replace(node, parentNode)
+    child.selectors.forEach(j => {
+      let node = parse(j, child)
+      let replaced = replace(node, parentNode)
       if (!replaced) {
         node.prepend(parser.combinator({ value: ' ' }))
         node.prepend(parentNode.clone())
@@ -66,8 +65,8 @@ function pickComment (comment, after) {
 }
 
 function atruleChilds (rule, atrule, bubbling) {
-  var children = []
-  atrule.each(function (child) {
+  let children = []
+  atrule.each(child => {
     if (child.type === 'comment') {
       children.push(child)
     } else if (child.type === 'decl') {
@@ -80,39 +79,39 @@ function atruleChilds (rule, atrule, bubbling) {
   })
   if (bubbling) {
     if (children.length) {
-      var clone = rule.clone({ nodes: [] })
-      for (var i = 0; i < children.length; i++) {
-        clone.append(children[i])
+      let clone = rule.clone({ nodes: [] })
+      for (let child of children) {
+        clone.append(child)
       }
       atrule.prepend(clone)
     }
   }
 }
 
-function pickDeclarations (selector, declarations, after) {
-  var parent = postcss.rule({
-    selector: selector,
+function pickDeclarations (selector, declarations, after, Rule) {
+  let parent = new Rule({
+    selector,
     nodes: []
   })
 
-  for (var i = 0; i < declarations.length; i++) {
-    parent.append(declarations[i])
+  for (let declaration of declarations) {
+    parent.append(declaration)
   }
 
   after.after(parent)
   return parent
 }
 
-function processRule (rule, bubble, unwrap, preserveEmpty) {
-  var unwrapped = false
-  var after = rule
-  var copyDeclarations = false
-  var declarations = []
+function processRule (rule, bubble, unwrap, preserveEmpty, Rule) {
+  let unwrapped = false
+  let after = rule
+  let copyDeclarations = false
+  let declarations = []
 
-  rule.each(function (child) {
+  rule.each(child => {
     if (child.type === 'rule') {
       if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after)
+        after = pickDeclarations(rule.selector, declarations, after, Rule)
         declarations = []
       }
 
@@ -126,7 +125,7 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
       copyDeclarations = false
 
       if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after)
+        after = pickDeclarations(rule.selector, declarations, after, Rule)
         declarations = []
       }
 
@@ -134,12 +133,9 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
         unwrapped = true
         atruleChilds(rule, child, false)
 
-        var nodes = child.nodes
+        let nodes = child.nodes
         if (child.params) {
-          nodes = postcss.rule({
-            selector: child.params,
-            nodes: nodes
-          })
+          nodes = new Rule({ selector: child.params, nodes })
         }
 
         after.after(nodes)
@@ -164,7 +160,7 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
   })
 
   if (declarations.length) {
-    after = pickDeclarations(rule.selector, declarations, after)
+    after = pickDeclarations(rule.selector, declarations, after, Rule)
   }
 
   if (unwrapped && preserveEmpty !== true) {
@@ -174,34 +170,38 @@ function processRule (rule, bubble, unwrap, preserveEmpty) {
 }
 
 function atruleNames (defaults, custom) {
-  var list = { }
-  var i, name
-  for (i = 0; i < defaults.length; i++) {
-    list[defaults[i]] = true
+  let list = {}
+  for (let i of defaults) {
+    list[i] = true
   }
   if (custom) {
-    for (i = 0; i < custom.length; i++) {
-      name = custom[i].replace(/^@/, '')
+    for (let i of custom) {
+      let name = i.replace(/^@/, '')
       list[name] = true
     }
   }
   return list
 }
 
-module.exports = postcss.plugin('postcss-nested', function (opts) {
-  if (!opts) opts = { }
-  var bubble = atruleNames(['media', 'supports'], opts.bubble)
-  var unwrap = atruleNames(['document', 'font-face', 'keyframes'], opts.unwrap)
-  var preserveEmpty = opts ? opts.preserveEmpty : false
+module.exports = (opts = {}) => {
+  let bubble = atruleNames(['media', 'supports'], opts.bubble)
+  let unwrap = atruleNames(['document', 'font-face', 'keyframes'], opts.unwrap)
+  let preserveEmpty = opts.preserveEmpty
 
-  var process = function (node) {
-    node.each(function (child) {
-      if (child.type === 'rule') {
-        processRule(child, bubble, unwrap, preserveEmpty)
-      } else if (child.type === 'atrule') {
-        process(child)
+  return {
+    postcssPlugin: 'postcss-nested',
+    Root (root, { Rule }) {
+      let process = function (node) {
+        node.each(child => {
+          if (child.type === 'rule') {
+            processRule(child, bubble, unwrap, preserveEmpty, Rule)
+          } else if (child.type === 'atrule') {
+            process(child)
+          }
+        })
       }
-    })
+      process(root)
+    }
   }
-  return process
-})
+}
+module.exports.postcss = true
