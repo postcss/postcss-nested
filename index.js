@@ -191,7 +191,7 @@ module.exports = (opts = {}) => {
   return {
     postcssPlugin: 'postcss-nested',
     Root (root, { Rule }) {
-      let process = function (node) {
+      function process (node) {
         node.each(child => {
           if (child.type === 'rule') {
             processRule(child, bubble, unwrap, preserveEmpty, Rule)
