@@ -10,26 +10,29 @@
     "nested"
   ],
   "scripts": {
-    "test": "jest-ci --coverage && eslint-ci *.js && check-dts"
+    "test": "jest-ci --coverage && eslint-ci . && check-dts"
   },
   "author": "Andrey Sitnik <andrey@sitnik.ru>",
   "license": "MIT",
   "repository": "postcss/postcss-nested",
+  "engines": {
+    "node": ">=10.0"
+  },
+  "peerDependencies": {
+    "postcss": "postcss/postcss"
+  },
   "dependencies": {
     "postcss-selector-parser": "^6.0.2"
   },
-  "peerDependencies": {
-    "postcss": "postcss/postcss#ose"
-  },
   "devDependencies": {
-    "@logux/eslint-config": "^40.0.3",
+    "@logux/eslint-config": "^40.0.4",
     "check-dts": "^0.3.3",
     "clean-publish": "^1.1.8",
-    "eslint": "^7.7.0",
+    "eslint": "^7.8.1",
     "eslint-ci": "^1.0.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-jest": "^24.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prefer-let": "^1.0.2",
     "eslint-plugin-prettierx": "^0.14.0",
@@ -37,12 +40,12 @@
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-unicorn": "^21.0.0",
-    "husky": "^4.2.5",
+    "husky": "^4.3.0",
     "jest": "^26.4.2",
     "jest-ci": "^0.1.1",
-    "lint-staged": "^10.2.11",
-    "postcss": "postcss/postcss#ose",
-    "postcss-sharec-config": "^0.1.1"
+    "lint-staged": "^10.3.0",
+    "postcss": "postcss/postcss",
+    "postcss-sharec-config": "^0.1.5"
   },
   "husky": {
     "hooks": {
@@ -68,6 +71,6 @@
   },
   "sharec": {
     "config": "postcss-sharec-config",
-    "version": "0.1.1"
+    "version": "0.1.5"
   }
 }
