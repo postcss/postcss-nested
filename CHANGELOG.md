@@ -1,6 +1,10 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 5.0
+* Moved to PostCSS 8.
+* Moved `postcss` to `peerDependencies`.
+
 ## 4.2.3
 * Fixed declarations after nested rule and before at-rule (by Rodion Demikhov).
 
