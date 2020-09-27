@@ -18,6 +18,10 @@
   "engines": {
     "node": ">=10.0"
   },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/postcss/"
+  },
   "peerDependencies": {
     "postcss": "^8.1.0"
   },
