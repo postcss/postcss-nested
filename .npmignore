@@ -3,3 +3,4 @@ yarn.lock
 
 *.test.js
 coverage/
+.github/

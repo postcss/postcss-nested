@@ -190,7 +190,7 @@ module.exports = (opts = {}) => {
 
   return {
     postcssPlugin: 'postcss-nested',
-    Root (root, { Rule }) {
+    Once (root, { Rule }) {
       function process (node) {
         node.each(child => {
           if (child.type === 'rule') {
