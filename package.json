@@ -48,7 +48,7 @@
     "jest-ci": "^0.1.1",
     "lint-staged": "^10.5.2",
     "postcss": "^8.1.10",
-    "postcss-sharec-config": "^0.2.0"
+    "postcss-sharec-config": "^0.2.1"
   },
   "husky": {
     "hooks": {
@@ -74,6 +74,6 @@
   },
   "sharec": {
     "config": "postcss-sharec-config",
-    "version": "0.2.0"
+    "version": "0.2.1"
   }
 }
