@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 5.0.2
+* Fixed compatibility with `postcss-mixins` by moving to visitor API.
+
 ## 5.0.1
 * Fixed PostCSS 8.1 compatibility.
 * Added funding links.
