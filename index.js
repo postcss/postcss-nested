@@ -102,73 +102,6 @@ function pickDeclarations (selector, declarations, after, Rule) {
   return parent
 }
 
-function processRule (rule, bubble, unwrap, preserveEmpty, Rule) {
-  let unwrapped = false
-  let after = rule
-  let copyDeclarations = false
-  let declarations = []
-
-  rule.each(child => {
-    if (child.type === 'rule') {
-      if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after, Rule)
-        declarations = []
-      }
-
-      copyDeclarations = true
-      unwrapped = true
-      child.selectors = selectors(rule, child)
-      after = pickComment(child.prev(), after)
-      after.after(child)
-      after = child
-    } else if (child.type === 'atrule') {
-      copyDeclarations = false
-
-      if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after, Rule)
-        declarations = []
-      }
-
-      if (child.name === 'at-root') {
-        unwrapped = true
-        atruleChilds(rule, child, false)
-
-        let nodes = child.nodes
-        if (child.params) {
-          nodes = new Rule({ selector: child.params, nodes })
-        }
-
-        after.after(nodes)
-        after = nodes
-        child.remove()
-      } else if (bubble[child.name]) {
-        unwrapped = true
-        atruleChilds(rule, child, true)
-        after = pickComment(child.prev(), after)
-        after.after(child)
-        after = child
-      } else if (unwrap[child.name]) {
-        unwrapped = true
-        atruleChilds(rule, child, false)
-        after = pickComment(child.prev(), after)
-        after.after(child)
-        after = child
-      }
-    } else if (child.type === 'decl' && copyDeclarations) {
-      declarations.push(child)
-    }
-  })
-
-  if (declarations.length) {
-    after = pickDeclarations(rule.selector, declarations, after, Rule)
-  }
-
-  if (unwrapped && preserveEmpty !== true) {
-    rule.raws.semicolon = true
-    if (rule.nodes.length === 0) rule.remove()
-  }
-}
-
 function atruleNames (defaults, custom) {
   let list = {}
   for (let i of defaults) {
@@ -190,17 +123,71 @@ module.exports = (opts = {}) => {
 
   return {
     postcssPlugin: 'postcss-nested',
-    Once (root, { Rule }) {
-      function process (node) {
-        node.each(child => {
-          if (child.type === 'rule') {
-            processRule(child, bubble, unwrap, preserveEmpty, Rule)
-          } else if (child.type === 'atrule') {
-            process(child)
+    RuleExit (rule, { Rule }) {
+      let unwrapped = false
+      let after = rule
+      let copyDeclarations = false
+      let declarations = []
+
+      rule.each(child => {
+        if (child.type === 'rule') {
+          if (declarations.length) {
+            after = pickDeclarations(rule.selector, declarations, after, Rule)
+            declarations = []
           }
-        })
+
+          copyDeclarations = true
+          unwrapped = true
+          child.selectors = selectors(rule, child)
+          after = pickComment(child.prev(), after)
+          after.after(child)
+          after = child
+        } else if (child.type === 'atrule') {
+          copyDeclarations = false
+
+          if (declarations.length) {
+            after = pickDeclarations(rule.selector, declarations, after, Rule)
+            declarations = []
+          }
+
+          if (child.name === 'at-root') {
+            unwrapped = true
+            atruleChilds(rule, child, false)
+
+            let nodes = child.nodes
+            if (child.params) {
+              nodes = new Rule({ selector: child.params, nodes })
+            }
+
+            after.after(nodes)
+            after = nodes
+            child.remove()
+          } else if (bubble[child.name]) {
+            unwrapped = true
+            atruleChilds(rule, child, true)
+            after = pickComment(child.prev(), after)
+            after.after(child)
+            after = child
+          } else if (unwrap[child.name]) {
+            unwrapped = true
+            atruleChilds(rule, child, false)
+            after = pickComment(child.prev(), after)
+            after.after(child)
+            after = child
+          }
+        } else if (child.type === 'decl' && copyDeclarations) {
+          declarations.push(child)
+        }
+      })
+
+      if (declarations.length) {
+        after = pickDeclarations(rule.selector, declarations, after, Rule)
       }
-      process(root)
+
+      if (unwrapped && preserveEmpty !== true) {
+        rule.raws.semicolon = true
+        if (rule.nodes.length === 0) rule.remove()
+      }
     }
   }
 }

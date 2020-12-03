@@ -55,7 +55,7 @@ it('unwrap rules inside at-rules', () => {
 it('unwraps at-rule', () => {
   run(
     'a { b { @media screen { width: auto } } }',
-    '@media screen {a b { width: auto } }'
+    '@media screen { a b { width: auto } }'
   )
 })
 
@@ -173,6 +173,23 @@ it('replaces ampersands in not selector', () => {
 
 it('handles :host selector case', () => {
   run(':host { &(:focus) {} }', ':host(:focus) {}')
+})
+
+it('works with other visitors', () => {
+  let css = 'a{b{color:red}@mixin;}'
+  let mixinPlugin = () => {
+    return {
+      postcssPlugin: 'mixin',
+      AtRule: {
+        mixin (node) {
+          node.replaceWith('.in{.deep{color:blue}}')
+        }
+      }
+    }
+  }
+  mixinPlugin.postcss = true
+  let out = postcss([plugin, mixinPlugin]).process(css, { from: undefined }).css
+  expect(out).toEqual('a b{color:red}a .in .deep{color:blue}')
 })
 
 it('shows clear errors on missed semicolon', () => {
