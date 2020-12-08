@@ -118,7 +118,16 @@ function atruleNames (defaults, custom) {
 
 module.exports = (opts = {}) => {
   let bubble = atruleNames(['media', 'supports'], opts.bubble)
-  let unwrap = atruleNames(['document', 'font-face', 'keyframes'], opts.unwrap)
+  let unwrap = atruleNames(
+    [
+      'document',
+      'font-face',
+      'keyframes',
+      '-webkit-keyframes',
+      '-moz-keyframes'
+    ],
+    opts.unwrap
+  )
   let preserveEmpty = opts.preserveEmpty
 
   return {
