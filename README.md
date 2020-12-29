@@ -27,7 +27,6 @@
 
   @at-root html {
       --font: 16px
-    }
   }
 }
 ```
