@@ -132,7 +132,7 @@ module.exports = (opts = {}) => {
 
   return {
     postcssPlugin: 'postcss-nested',
-    RuleExit (rule, { Rule }) {
+    Rule (rule, { Rule }) {
       let unwrapped = false
       let after = rule
       let copyDeclarations = false
@@ -152,8 +152,6 @@ module.exports = (opts = {}) => {
           after.after(child)
           after = child
         } else if (child.type === 'atrule') {
-          copyDeclarations = false
-
           if (declarations.length) {
             after = pickDeclarations(rule.selector, declarations, after, Rule)
             declarations = []
@@ -172,17 +170,21 @@ module.exports = (opts = {}) => {
             after = nodes
             child.remove()
           } else if (bubble[child.name]) {
+            copyDeclarations = true
             unwrapped = true
             atruleChilds(rule, child, true)
             after = pickComment(child.prev(), after)
             after.after(child)
             after = child
           } else if (unwrap[child.name]) {
+            copyDeclarations = true
             unwrapped = true
             atruleChilds(rule, child, false)
             after = pickComment(child.prev(), after)
             after.after(child)
             after = child
+          } else if (copyDeclarations) {
+            declarations.push(child)
           }
         } else if (child.type === 'decl' && copyDeclarations) {
           declarations.push(child)
