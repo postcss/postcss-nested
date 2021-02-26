@@ -55,7 +55,7 @@ it('unwrap rules inside at-rules', () => {
 it('unwraps at-rule', () => {
   run(
     'a { b { @media screen { width: auto } } }',
-    '@media screen { a b { width: auto } }'
+    '@media screen {a b { width: auto } }'
   )
 })
 
