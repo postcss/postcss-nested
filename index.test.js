@@ -55,7 +55,7 @@ it('unwrap rules inside at-rules', () => {
 it('unwraps at-rule', () => {
   run(
     'a { b { @media screen { width: auto } } }',
-    '@media screen { a b { width: auto } }'
+    '@media screen {a b { width: auto } }'
   )
 })
 
@@ -84,6 +84,13 @@ it('unwraps at-rules', () => {
   run(
     'a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
     'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }'
+  )
+})
+
+it('unwraps at-rules with interleaved properties', () => {
+  run(
+    'a { a: 1 } a { color: red; @media screen { @supports (a: 1) { a: 1 } } background: green }',
+    'a { a: 1 } a { color: red; } @media screen { @supports (a: 1) { a { a: 1 } } } a { background: green }'
   )
 })
 
@@ -171,6 +178,25 @@ it('replaces ampersands in not selector', () => {
   run('.a { &:not(&.no) {} }', '.a:not(.a.no) {}')
 })
 
+it('correctly replaces tail ampersands', () => {
+  run('.a { .b & {} }', '.b .a {}')
+})
+
+it('correctly replaces tail ampersands that are nested further down', () => {
+  run('.a { .b { .c & {} } }', '.c .a .b {}')
+})
+
+it('correctly replaces tail ampersands that are nested inside ampersand rules', () => {
+  run('.a { &:hover { .b { .c & {} } } }', '.c .a:hover .b {}')
+})
+
+it('preserves child order when replacing tail ampersands', () => {
+  run(
+    '.a { color: red; .first {} @mixinFirst; .b & {} @mixinLast; .last {} }',
+    '.a { color: red; } .a .first {} .a { @mixinFirst; } .b .a {} .a { @mixinLast; } .a .last {}'
+  )
+})
+
 it('handles :host selector case', () => {
   run(':host { &(:focus) {} }', ':host(:focus) {}')
 })
@@ -190,6 +216,23 @@ it('works with other visitors', () => {
   mixinPlugin.postcss = true
   let out = postcss([plugin, mixinPlugin]).process(css, { from: undefined }).css
   expect(out).toEqual('a b{color:red}a .in .deep{color:blue}')
+})
+
+it('works with other visitors #2', () => {
+  let css = 'a { @mixin; b {color:red} }'
+  let mixinPlugin = () => {
+    return {
+      postcssPlugin: 'mixin',
+      AtRule: {
+        mixin (node) {
+          node.replaceWith('.in { .deep {color:blue} }')
+        }
+      }
+    }
+  }
+  mixinPlugin.postcss = true
+  let out = postcss([plugin, mixinPlugin]).process(css, { from: undefined }).css
+  expect(out).toEqual('a .in .deep {color:blue} a b {color:red}')
 })
 
 it('shows clear errors on missed semicolon', () => {
