@@ -133,6 +133,10 @@ it('processes comma inside', () => {
   run('a, b { .one, .two {} }', 'a .one, a .two, b .one, b .two {}')
 })
 
+it('clears empty selector after comma', () => {
+  run('a, b { .one, .two, {} }', 'a .one, a .two, b .one, b .two {}')
+})
+
 it('moves comment with rule', () => {
   run('a { /*B*/ b {} }', '/*B*/ a b {}')
 })

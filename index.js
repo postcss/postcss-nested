@@ -43,13 +43,15 @@ function selectors (parent, child) {
     let parentNode = parse(i, parent)
 
     child.selectors.forEach(j => {
-      let node = parse(j, child)
-      let replaced = replace(node, parentNode)
-      if (!replaced) {
-        node.prepend(parser.combinator({ value: ' ' }))
-        node.prepend(parentNode.clone())
+      if (j.length) {
+        let node = parse(j, child)
+        let replaced = replace(node, parentNode)
+        if (!replaced) {
+          node.prepend(parser.combinator({ value: ' ' }))
+          node.prepend(parentNode.clone())
+        }
+        result.push(node.toString())
       }
-      result.push(node.toString())
     })
   })
   return result
