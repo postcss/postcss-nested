@@ -59,10 +59,12 @@ html {
 
 Related plugins:
 
+* Use [`postcss-atroot`] for `@at-root` at-rule to move nested child
+  to the CSS root.
 * Use [`postcss-current-selector`] **after** this plugin if you want
-to use current selector in properties or variables values.
+  to use current selector in properties or variables values.
 * Use [`postcss-nested-ancestors`] **before** this plugin if you want
-to reference any ancestor element directly in your selectors with `^&`.
+  to reference any ancestor element directly in your selectors with `^&`.
 
 Alternatives:
 
