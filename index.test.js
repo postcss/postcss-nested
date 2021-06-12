@@ -218,7 +218,9 @@ it('works with other visitors', () => {
     }
   }
   mixinPlugin.postcss = true
-  let out = postcss([plugin, mixinPlugin]).process(css, { from: undefined }).css
+  let out = postcss([plugin, mixinPlugin]).process(css, {
+    from: undefined
+  }).css
   expect(out).toEqual('a b{color:red}a .in .deep{color:blue}')
 })
 
@@ -235,7 +237,9 @@ it('works with other visitors #2', () => {
     }
   }
   mixinPlugin.postcss = true
-  let out = postcss([plugin, mixinPlugin]).process(css, { from: undefined }).css
+  let out = postcss([plugin, mixinPlugin]).process(css, {
+    from: undefined
+  }).css
   expect(out).toEqual('a .in .deep {color:blue} a b {color:red}')
 })
 
@@ -251,4 +255,15 @@ it('shows clear errors on other errors', () => {
   expect(() => {
     css = postcss([plugin]).process(css, { from: undefined }).css
   }).toThrow(':2:3: Unexpected')
+})
+
+it('third level dependencies', () => {
+  run(
+    '.text {&:hover{border-color: red;&:before{color: red;}}}',
+    '.text:hover{border-color: red;}.text:hover:before{color: red;}'
+  )
+})
+
+it('third level dependencies #2', () => {
+  run('.selector{:global{h2{color:pink}}}', '.selector :global h2{color:pink}')
 })
