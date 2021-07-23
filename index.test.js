@@ -96,8 +96,8 @@ it('unwraps at-rules with interleaved properties', () => {
 
 it('do not move custom at-rules', () => {
   run(
-    '.one { @mixin test; } .two { @phone { color: black } }',
-    '.one { @mixin test; } @phone { .two { color: black } }',
+    '.one { @mixin test; } .two { @media screen { @mixin test; } } .three { @phone { color: black } }',
+    '.one { @mixin test; } @media screen { .two { @mixin test } } @phone { .three { color: black } }',
     { bubble: ['phone'] }
   )
 })

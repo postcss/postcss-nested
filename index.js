@@ -76,7 +76,11 @@ function atruleChilds (rule, atrule, bubbling) {
     } else if (child.type === 'rule' && bubbling) {
       child.selectors = selectors(rule, child)
     } else if (child.type === 'atrule') {
-      atruleChilds(rule, child, bubbling)
+      if (child.nodes) {
+        atruleChilds(rule, child, bubbling)
+      } else {
+        children.push(child)
+      }
     }
   })
   if (bubbling) {
