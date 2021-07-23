@@ -94,11 +94,18 @@ it('unwraps at-rules with interleaved properties', () => {
   )
 })
 
-it('do not move custom at-rules', () => {
+it('does not move custom at-rules', () => {
   run(
-    '.one { @mixin test; } .two { @media screen { @mixin test; } } .three { @phone { color: black } }',
-    '.one { @mixin test; } @media screen { .two { @mixin test } } @phone { .three { color: black } }',
+    '.one { @mixin test; } .two { @media screen { @mixin test; } } .three { @media screen { @mixin test { color: black } } } .four { @phone { color: black } }',
+    '.one { @mixin test; } @media screen { .two { @mixin test } } @media screen { .three { @mixin test { color: black } } } @phone { .four { color: black } }',
     { bubble: ['phone'] }
+  )
+})
+
+it('does not move custom at-rules placed under nested bubbling ones', () => {
+  run(
+    '.one { @supports (color: black) { @media screen { @mixin test; } } } .two { @supports (color: black) { @media screen { @mixin test { color: black } } } }',
+    '@supports (color: black) { @media screen {.one { @mixin test } } } @supports (color: black) { @media screen { .two { @mixin test { color: black } } } }'
   )
 })
 

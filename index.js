@@ -66,30 +66,32 @@ function pickComment (comment, after) {
   }
 }
 
-function atruleChilds (rule, atrule, bubbling) {
-  let children = []
-  atrule.each(child => {
-    if (child.type === 'comment') {
-      children.push(child)
-    } else if (child.type === 'decl') {
-      children.push(child)
-    } else if (child.type === 'rule' && bubbling) {
-      child.selectors = selectors(rule, child)
-    } else if (child.type === 'atrule') {
-      if (child.nodes) {
-        atruleChilds(rule, child, bubbling)
-      } else {
+function createFnAtruleChilds (bubble) {
+  return function atruleChilds (rule, atrule, bubbling) {
+    let children = []
+    atrule.each(child => {
+      if (child.type === 'comment') {
         children.push(child)
+      } else if (child.type === 'decl') {
+        children.push(child)
+      } else if (child.type === 'rule' && bubbling) {
+        child.selectors = selectors(rule, child)
+      } else if (child.type === 'atrule') {
+        if (child.nodes && bubble[child.name]) {
+          atruleChilds(rule, child, true)
+        } else {
+          children.push(child)
+        }
       }
-    }
-  })
-  if (bubbling) {
-    if (children.length) {
-      let clone = rule.clone({ nodes: [] })
-      for (let child of children) {
-        clone.append(child)
+    })
+    if (bubbling) {
+      if (children.length) {
+        let clone = rule.clone({ nodes: [] })
+        for (let child of children) {
+          clone.append(child)
+        }
+        atrule.prepend(clone)
       }
-      atrule.prepend(clone)
     }
   }
 }
@@ -124,6 +126,7 @@ function atruleNames (defaults, custom) {
 
 module.exports = (opts = {}) => {
   let bubble = atruleNames(['media', 'supports'], opts.bubble)
+  let atruleChilds = createFnAtruleChilds(bubble)
   let unwrap = atruleNames(
     [
       'document',
