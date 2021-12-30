@@ -10,6 +10,7 @@
     "nested"
   ],
   "scripts": {
+    "unit": "jest",
     "test": "jest --coverage && eslint ."
   },
   "author": "Andrey Sitnik <andrey@sitnik.ru>",

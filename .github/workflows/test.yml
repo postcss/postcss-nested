@@ -1,24 +1,29 @@
 name: Test
-"on":
-  push: null
-  pull_request: null
-env:
-  FORCE_COLOR: 2
+on:
+  push:
+  pull_request:
 jobs:
   full:
-    name: Node.js 16 Full
+    name: Node.js 17 Full
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 17
+          cache: pnpm
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Run tests
-        run: yarn test
+        run: pnpm test
+        env:
+          FORCE_COLOR: 2
   short:
     runs-on: ubuntu-latest
     strategy:
@@ -31,11 +36,18 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - name: Install Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+          cache: pnpm
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Run unit tests
-        run: npx jest
+        run: pnpm unit
+        env:
+          FORCE_COLOR: 2
