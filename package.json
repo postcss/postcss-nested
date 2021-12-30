@@ -10,8 +10,8 @@
     "nested"
   ],
   "scripts": {
-    "unit": "jest",
-    "test": "jest --coverage && eslint ."
+    "unit": "uvu . '\\.test\\.js$'",
+    "test": "c8 pnpm unit && eslint ."
   },
   "author": "Andrey Sitnik <andrey@sitnik.ru>",
   "license": "MIT",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@logux/eslint-config": "^46.1.1",
+    "c8": "^7.11.0",
     "clean-publish": "^3.4.4",
     "eslint": "^8.5.0",
     "eslint-config-standard": "^16.0.3",
@@ -38,8 +39,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prefer-let": "^3.0.1",
     "eslint-plugin-promise": "^6.0.0",
-    "jest": "^27.4.5",
-    "postcss": "^8.4.5"
+    "postcss": "^8.4.5",
+    "uvu": "^0.5.2"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -50,21 +51,16 @@
     "trailingComma": "none"
   },
   "eslintConfig": {
-    "extends": "@logux/eslint-config",
-    "rules": {
-      "unicorn/better-regex": "off"
-    },
-    "globals": {
-      "it": "readonly",
-      "expect": "readonly"
-    }
+    "extends": "@logux/eslint-config"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "coverageThreshold": {
-      "global": {
-        "statements": 100
-      }
-    }
+  "c8": {
+    "exclude": [
+      "**/*.test.*"
+    ],
+    "lines": 100,
+    "check-coverage": true
+  },
+  "clean-publish": {
+    "cleanDocs": true
   }
 }
