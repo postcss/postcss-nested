@@ -2,4 +2,3 @@ pnpm-lock.yaml
 
 *.test.js
 coverage/
-.github/
