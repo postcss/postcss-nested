@@ -26,29 +26,19 @@
     "postcss": "^8.2.14"
   },
   "dependencies": {
-    "postcss-selector-parser": "^6.0.6"
+    "postcss-selector-parser": "^6.0.8"
   },
   "devDependencies": {
-    "@logux/eslint-config": "^45.4.6",
-    "clean-publish": "^2.2.0",
-    "eslint": "^7.31.0",
+    "@logux/eslint-config": "^46.1.1",
+    "clean-publish": "^3.4.4",
+    "eslint": "^8.5.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prefer-let": "^1.1.0",
-    "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-security": "^1.4.0",
-    "eslint-plugin-unicorn": "^34.0.1",
-    "jest": "^27.0.6",
-    "lint-staged": "^11.1.1",
-    "postcss": "^8.3.6",
-    "postcss-sharec-config": "^0.4.1",
-    "prettier": "^2.2.1",
-    "simple-git-hooks": "^2.4.1"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "eslint-plugin-prefer-let": "^3.0.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "jest": "^27.4.5",
+    "postcss": "^8.4.5"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -58,16 +48,14 @@
     "singleQuote": true,
     "trailingComma": "none"
   },
-  "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
   "eslintConfig": {
     "extends": "@logux/eslint-config",
     "rules": {
       "unicorn/better-regex": "off"
+    },
+    "globals": {
+      "it": "readonly",
+      "expect": "readonly"
     }
   },
   "jest": {
@@ -77,9 +65,5 @@
         "statements": 100
       }
     }
-  },
-  "sharec": {
-    "config": "postcss-sharec-config",
-    "version": "0.4.1"
   }
 }
