@@ -81,7 +81,7 @@ Alternatives:
 [`postcss-current-selector`]: https://github.com/komlev/postcss-current-selector
 [`postcss-nested-ancestors`]: https://github.com/toomuchdesign/postcss-nested-ancestors
 [`postcss-nested-props`]:     https://github.com/jedmao/postcss-nested-props
-[`postcss-nesting`]:          https://github.com/jonathantneal/postcss-nesting
+[`postcss-nesting`]:          https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting
 [CSSWG draft]:              https://drafts.csswg.org/css-nesting-1/
 [PostCSS]:                  https://github.com/postcss/postcss
 
