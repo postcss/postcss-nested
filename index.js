@@ -27,6 +27,11 @@ let parser = require('postcss-selector-parser')
   })
   try {
     saver.processSync(rawSelector)
+    if (typeof nodes === 'undefined') {
+      // Should never happen but @ts-check can't deduce the side-effect
+      // triggered by `saver.processSync(str)`
+      throw new Error('Parsing failed')
+    }
   } catch (e) {
     if (rawSelector.includes(':')) {
       throw rule ? rule.error('Missed semicolon') : e
@@ -51,7 +56,7 @@ function interpolateAmpInSelecctor (nodes, parent) {
   let replaced = false
   nodes.each(/** @type {Node} */ node => {
     if (node.type === 'nesting') {
-      let clonedParent = parent.clone()
+      let clonedParent = parent.clone({})
       if (node.value !== '&') {
         node.replaceWith(
           parse(node.value.replace('&', clonedParent.toString()))
@@ -60,7 +65,7 @@ function interpolateAmpInSelecctor (nodes, parent) {
         node.replaceWith(clonedParent)
       }
       replaced = true
-    } else if (node.nodes) {
+    } else if ('nodes' in node && node.nodes) {
       if (interpolateAmpInSelecctor(node, parent)) {
         replaced = true
       }
@@ -89,8 +94,9 @@ function interpolateAmpInSelecctor (nodes, parent) {
       let node = parse(selector, child)
       let replaced = interpolateAmpInSelecctor(node, parentNode)
       if (!replaced) {
+        // FIXME: Resolve these @ts-check errors somehow.
         node.prepend(parser.combinator({ value: ' ' }))
-        node.prepend(parentNode.clone())
+        node.prepend(parentNode.clone({}))
       }
       merged.push(node.toString())
     })
