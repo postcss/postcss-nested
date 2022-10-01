@@ -128,18 +128,12 @@ function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
     /** @type {Array<ChildNode>} */
     let children = []
     atrule.each(child => {
-      if (child.type === 'comment') {
-        children.push(child)
-      } else if (child.type === 'decl') {
-        children.push(child)
-      } else if (child.type === 'rule' && bubbling) {
+      if (child.type === 'rule' && bubbling) {
         child.selectors = mergeSelectors(rule, child)
-      } else if (child.type === 'atrule') {
-        if (child.nodes && bubble[child.name]) {
-          atruleChilds(rule, child, true)
-        } else {
-          children.push(child)
-        }
+      } else if (child.type === 'atrule' && child.nodes && bubble[child.name]) {
+        atruleChilds(rule, child, true)
+      } else {
+        children.push(child)
       }
     })
     if (bubbling) {
@@ -165,11 +159,7 @@ function pickDeclarations (selector, declarations, after, Rule) {
     selector,
     nodes: []
   })
-
-  for (let declaration of declarations) {
-    parent.append(declaration)
-  }
-
+  parent.append(declarations)
   after.after(parent)
   return parent
 }
