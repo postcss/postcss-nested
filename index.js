@@ -15,20 +15,20 @@ let parser = require('postcss-selector-parser')
 /**
  * Run a selector string through postcss-selector-parser
  *
- * @param {string} str
+ * @param {string} rawSelector
  * @param {PostcssRule} [rule]
  * @returns {Selector}
  */
- function parse (str, rule) {
+ function parse(rawSelector, rule) {
   /** @type {parser.Root | undefined} */
   let nodes
   let saver = parser(parsed => {
     nodes = parsed
   })
   try {
-    saver.processSync(str)
+    saver.processSync(rawSelector)
   } catch (e) {
-    if (str.includes(':')) {
+    if (rawSelector.includes(':')) {
       throw rule ? rule.error('Missed semicolon') : e
     } else {
       throw rule ? rule.error(e.message) : e
@@ -47,19 +47,21 @@ let parser = require('postcss-selector-parser')
  * @param {Selector} parent
  * @returns {boolean} Indicating whether a replacement took place or not.
  */
-function replace (nodes, parent) {
+function interpolateAmpInSelecctor (nodes, parent) {
   let replaced = false
-  nodes.each(/** @type {Node} */ i => {
-    if (i.type === 'nesting') {
+  nodes.each(/** @type {Node} */ node => {
+    if (node.type === 'nesting') {
       let clonedParent = parent.clone()
-      if (i.value !== '&') {
-        i.replaceWith(parse(i.value.replace('&', clonedParent.toString())))
+      if (node.value !== '&') {
+        node.replaceWith(
+          parse(node.value.replace('&', clonedParent.toString()))
+        )
       } else {
-        i.replaceWith(clonedParent)
+        node.replaceWith(clonedParent)
       }
       replaced = true
-    } else if (i.nodes) {
-      if (replace(i, parent)) {
+    } else if (node.nodes) {
+      if (interpolateAmpInSelecctor(node, parent)) {
         replaced = true
       }
     }
@@ -74,25 +76,26 @@ function replace (nodes, parent) {
   * @param {PostcssRule} child
   * @returns {Array<string>} An array of new, merged selectors
  */
- function selectors (parent, child) {
+ function mergeSelectors (parent, child) {
   /** @type {Array<string>} */
-  let result = []
-  parent.selectors.forEach(i => {
-    let parentNode = parse(i, parent)
+  let merged = []
+  parent.selectors.forEach(sel => {
+    let parentNode = parse(sel, parent)
 
-    child.selectors.forEach(j => {
-      if (j.length) {
-        let node = parse(j, child)
-        let replaced = replace(node, parentNode)
-        if (!replaced) {
-          node.prepend(parser.combinator({ value: ' ' }))
-          node.prepend(parentNode.clone())
-        }
-        result.push(node.toString())
+    child.selectors.forEach(selector => {
+      if (!selector) {
+        return
       }
+      let node = parse(selector, child)
+      let replaced = interpolateAmpInSelecctor(node, parentNode)
+      if (!replaced) {
+        node.prepend(parser.combinator({ value: ' ' }))
+        node.prepend(parentNode.clone())
+      }
+      merged.push(node.toString())
     })
   })
-  return result
+  return merged
 }
 
 /**
@@ -124,7 +127,7 @@ function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
       } else if (child.type === 'decl') {
         children.push(child)
       } else if (child.type === 'rule' && bubbling) {
-        child.selectors = selectors(rule, child)
+        child.selectors = mergeSelectors(rule, child)
       } else if (child.type === 'atrule') {
         if (child.nodes && bubble[child.name]) {
           atruleChilds(rule, child, true)
@@ -172,13 +175,12 @@ function pickDeclarations (selector, declarations, after, Rule) {
 function atruleNames (defaults, custom) {
   /** @type {RuleMap} */
   let list = {}
-  for (let i of defaults) {
-    list[i] = true
+  for (let name of defaults) {
+    list[name] = true
   }
   if (custom) {
-    for (let i of custom) {
-      let name = i.replace(/^@/, '')
-      list[name] = true
+    for (let name of custom) {
+      list[name.replace(/^@/, '')] = true
     }
   }
   return list
@@ -219,7 +221,7 @@ module.exports = (opts = {}) => {
 
           copyDeclarations = true
           unwrapped = true
-          child.selectors = selectors(rule, child)
+          child.selectors = mergeSelectors(rule, child)
           after = pickComment(child.prev(), after)
           after.after(child)
           after = child
