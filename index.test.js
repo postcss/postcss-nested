@@ -4,9 +4,17 @@ let postcss = require('postcss')
 
 let plugin = require('./')
 
+function normalise(css) {
+  return css
+    .replace(/([:;{}]|\*\/|\/\*)/g, ' $1 ')
+    .replace(/\s\s+/g, ' ')
+    .replace(/ ([;:])/g, '$1')
+    .trim()
+}
+
 function run(input, output, opts) {
   let result = postcss([plugin(opts)]).process(input, { from: '/test.css' })
-  equal(result.css, output)
+  equal(normalise(result.css), normalise(output))
   equal(result.warnings().length, 0)
 }
 
