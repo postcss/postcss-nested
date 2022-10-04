@@ -3,6 +3,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Upcoming...
 * ... <!-- Add new lines here. -->
+* fix: Correctly handle `with`/`without` parameters on `@at-root`
 * fix: Errors when handling sibling `@at-root` rule blocks
 * fix: Move all preceeding comments with rule
 * fix: `@layer` blocks should also bubble

@@ -111,7 +111,7 @@ test('at-root unwraps nested media', () => {
   run('a { & {} @media x { @at-root { b { } } } }', 'a {} @media x { b {} }')
 })
 
-test.skip('nested at-root with nested media', () => {
+test('nested at-root with nested media', () => {
   run(
     `a {
       & {}
@@ -135,7 +135,7 @@ test.skip('nested at-root with nested media', () => {
   )
 })
 
-test.skip('at-root supports (without: all)', () => {
+test('at-root supports (without: all)', () => {
   run(
     `@media x {
       @supports (z:y) {
@@ -191,7 +191,7 @@ test.skip('at-root supports (without: all)', () => {
   )
 })
 
-test.skip('at-root supports (with: all)', () => {
+test('at-root supports (with: all)', () => {
   run(
     `@media x {
       @supports (z:y) {
@@ -224,7 +224,7 @@ test.skip('at-root supports (with: all)', () => {
   )
 })
 
-test.skip('at-root supports (without: foo)', () => {
+test('at-root supports (without: foo)', () => {
   run(
     `@media x {
       a {
@@ -241,7 +241,7 @@ test.skip('at-root supports (without: foo)', () => {
   )
 })
 
-test.skip('at-root supports (without: foo) 2', () => {
+test('at-root supports (without: foo) 2', () => {
   run(
     `@supports (y:z) {
       @media x {
@@ -262,7 +262,7 @@ test.skip('at-root supports (without: foo) 2', () => {
   )
 })
 
-test.skip('at-root supports (with: foo)', () => {
+test('at-root supports (with: foo)', () => {
   run(
     `@supports (y:z) {
       @media x {
@@ -283,7 +283,7 @@ test.skip('at-root supports (with: foo)', () => {
   )
 })
 
-test.skip('at-root supports (without: foo) 3', () => {
+test('at-root supports (without: foo) 3', () => {
   run(
     `@supports (y:z) {
       @media x {
@@ -307,7 +307,7 @@ test.skip('at-root supports (without: foo) 3', () => {
 })
 
 
-test.skip('at-root supports (without: foo) 4', () => {
+test('at-root supports (without: foo) 4', () => {
   run(
     `@media x {
       @supports (y:z) {
@@ -328,7 +328,7 @@ test.skip('at-root supports (without: foo) 4', () => {
   )
 })
 
-test.skip('at-root supports (without: foo) 5', () => {
+test('at-root supports (without: foo) 5', () => {
   run(
     `@media x {
       @supports (a:b) {
@@ -479,7 +479,7 @@ test('leaves nested @media blocks as is', () => {
   )
 })
 
-test.skip('@at-root fully espacpes nested @media blocks', () => {
+test('@at-root fully espacpes nested @media blocks', () => {
   run(
     `a { x: 3 }
     a {
@@ -714,7 +714,7 @@ test('shows clear errors on other errors', () => {
   }, ':2:3: Unexpected')
 })
 
-test.skip('errors on unknown @at-root parameters', () => {
+test('errors on unknown @at-root parameters', () => {
   let css = 'a {\n  @at-root (wonky: "blah") {\n    b {}\n  }\n}'
   throws(() => {
     css = postcss([plugin]).process(css, { from: undefined }).css
