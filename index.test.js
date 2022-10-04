@@ -1,9 +1,14 @@
+// @ts-check
 let { equal, throws } = require('uvu/assert')
 let { test } = require('uvu')
-let postcss = require('postcss')
+let postcss = require('postcss').default
 
 let plugin = require('./')
 
+/**
+ * @param {string} css
+ * @returns {string}
+ */
 function normalise(css) {
   return css
     .replace(/([:;{}]|\*\/|\/\*)/g, ' $1 ')
@@ -12,6 +17,11 @@ function normalise(css) {
     .trim()
 }
 
+/**
+ * @param {string} input
+ * @param {string} output
+ * @param {plugin.Options | undefined} [opts]
+ */
 function run(input, output, opts) {
   let result = postcss([plugin(opts)]).process(input, { from: '/test.css' })
   equal(normalise(result.css), normalise(output))
@@ -234,7 +244,7 @@ test('works with other visitors', () => {
       }
     }
   }
-  mixinPlugin.postcss = true
+  mixinPlugin.postcss = /** @type {const} */ (true)
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css
@@ -253,7 +263,7 @@ test('works with other visitors #2', () => {
       }
     }
   }
-  mixinPlugin.postcss = true
+  mixinPlugin.postcss = /** @type {const} */ (true)
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css

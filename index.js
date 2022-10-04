@@ -1,6 +1,26 @@
+// @ts-check
 let parser = require('postcss-selector-parser')
 
-function parse (str, rule) {
+/** @typedef {import('postcss').ChildNode}  ChildNode */
+/** @typedef {import('postcss').Comment}  Comment */
+/** @typedef {import('postcss').Declaration}  Declaration */
+/** @typedef {import('postcss').Rule}  PostcssRule */
+/** @typedef {import('postcss').AtRule}  AtRule */
+/** @typedef {typeof import('postcss').Rule}  RuleConstructor */
+/** @typedef {parser.Root}  Root */
+/** @typedef {parser.Node}  Node */
+/** @typedef {parser.Selector}  Selector */
+/** @typedef {Record<string, true>}  RuleMap  Simple lookup table for \@-rules */
+
+/**
+ * Run a selector string through postcss-selector-parser
+ *
+ * @param {string} str
+ * @param {PostcssRule} [rule]
+ * @returns {Selector}
+ */
+ function parse (str, rule) {
+  /** @type {parser.Root | undefined} */
   let nodes
   let saver = parser(parsed => {
     nodes = parsed
@@ -17,9 +37,19 @@ function parse (str, rule) {
   return nodes.at(0)
 }
 
+/**
+ * Replaces the "&" token in a node's selector with the parent selector
+ * similar to what SCSS does.
+ *
+ * Mutates the nodes list
+ *
+ * @param {Extract<Node, { nodes: Array }>} nodes
+ * @param {Selector} parent
+ * @returns {boolean} Indicating whether a replacement took place or not.
+ */
 function replace (nodes, parent) {
   let replaced = false
-  nodes.each(i => {
+  nodes.each(/** @type {Node} */ i => {
     if (i.type === 'nesting') {
       let clonedParent = parent.clone()
       if (i.value !== '&') {
@@ -37,7 +67,15 @@ function replace (nodes, parent) {
   return replaced
 }
 
-function selectors (parent, child) {
+ /**
+  * Combines parent and child selectors, in a SCSS-like way
+  *
+  * @param {PostcssRule} parent
+  * @param {PostcssRule} child
+  * @returns {Array<string>} An array of new, merged selectors
+ */
+ function selectors (parent, child) {
+  /** @type {Array<string>} */
   let result = []
   parent.selectors.forEach(i => {
     let parentNode = parse(i, parent)
@@ -57,6 +95,11 @@ function selectors (parent, child) {
   return result
 }
 
+/**
+ * @param {ChildNode | undefined} comment
+ * @param {ChildNode} after
+ * @returns {ChildNode} updated "after" node
+ */
 function pickComment (comment, after) {
   if (comment && comment.type === 'comment') {
     after.after(comment)
@@ -66,8 +109,14 @@ function pickComment (comment, after) {
   }
 }
 
-function createFnAtruleChilds (bubble) {
+function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
+  /**
+   * @param {PostcssRule} rule
+   * @param {AtRule} atrule
+   * @param {boolean} bubbling
+   */
   return function atruleChilds (rule, atrule, bubbling) {
+    /** @type {Array<ChildNode>} */
     let children = []
     atrule.each(child => {
       if (child.type === 'comment') {
@@ -96,6 +145,12 @@ function createFnAtruleChilds (bubble) {
   }
 }
 
+/**
+ * @param {string} selector
+ * @param {Array<ChildNode>} declarations
+ * @param {ChildNode} after
+ * @param {RuleConstructor} Rule
+ */
 function pickDeclarations (selector, declarations, after, Rule) {
   let parent = new Rule({
     selector,
@@ -110,7 +165,12 @@ function pickDeclarations (selector, declarations, after, Rule) {
   return parent
 }
 
+/**
+ * @param {Array<string>} defaults,
+ * @param {Array<string>} [custom]
+ */
 function atruleNames (defaults, custom) {
+  /** @type {RuleMap} */
   let list = {}
   for (let i of defaults) {
     list[i] = true
@@ -124,6 +184,7 @@ function atruleNames (defaults, custom) {
   return list
 }
 
+/** @type {import('./').Nested} */
 module.exports = (opts = {}) => {
   let bubble = atruleNames(['media', 'supports'], opts.bubble)
   let atruleChilds = createFnAtruleChilds(bubble)
@@ -143,8 +204,10 @@ module.exports = (opts = {}) => {
     postcssPlugin: 'postcss-nested',
     Rule (rule, { Rule }) {
       let unwrapped = false
+      /** @type {ChildNode} */
       let after = rule
       let copyDeclarations = false
+      /** @type {Array<ChildNode>} */
       let declarations = []
 
       rule.each(child => {
