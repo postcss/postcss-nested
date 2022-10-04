@@ -49,8 +49,20 @@ test('hoists at-root', () => {
   run('a { & {} @at-root { b {} } }', 'a {} b {}')
 })
 
+test('hoists at-root 2', () => {
+  run('a { @at-root { b {} } }', 'b {}')
+})
+
 test('at-root short hand', () => {
   run('a { & {} @at-root b { } }', 'a {} b {}')
+})
+
+test('at-root stops at media', () => {
+  run('@media x { a { & {} @at-root { b { } } } }', '@media x { a {} b {} }')
+})
+
+test('at-root unwraps nested media', () => {
+  run('a { & {} @media x { @at-root { b { } } } }', 'a {} @media x { b {} }')
 })
 
 test('replaces ampersand', () => {
@@ -104,6 +116,60 @@ test('unwraps at-rules', () => {
   run(
     'a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
     'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }'
+  )
+})
+
+test('leaves nested @media blocks as is', () => {
+  run(
+    `a { a: 1 }
+    a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            @media (min-width: 50rem) {
+              a: 1
+            }
+          }
+        }
+      }
+    }`,
+    `a { a: 1 }
+    @media screen {
+      @media (max-width: 100rem) {
+        @media (min-width: 50rem) {
+          a b { a: 1 }
+        }
+      }
+    }`
+  )
+})
+
+test('Multi nested @media is resolved', () => {
+  run(
+    `a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            y: y;
+            c {
+              @media (min-width: 50rem) {
+                x: x
+              }
+            }
+          }
+        }
+      }
+    }`,
+    `@media screen {
+      @media (max-width: 100rem) {
+        a b {
+          y: y
+        }
+        @media (min-width: 50rem) {
+          a b c { x:x }
+        }
+      }
+    }`
   )
 })
 
