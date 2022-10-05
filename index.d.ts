@@ -24,6 +24,13 @@ declare namespace nested {
      * to preserve them.
      */
     preserveEmpty?: boolean
+
+    /**
+     * The plugin supports the SCSS custom at-rule `@at-root` which
+     * rule blocks out of the nesting. If you want you can choose a
+     * new custom name for this rule.
+     */
+    rootRuleName?: string
   }
 
   type Nested = PluginCreator<Options>

@@ -324,15 +324,16 @@ function handleAtRootWithRules (at_root) {
  * @param {AtRule} child
  * @param {ChildNode} after
  * @param {{ (rule: PostcssRule, atrule: AtRule, bubbling: boolean, mergeSels?: boolean): void; }} atruleChilds
+ * @param {string} rootRuleName
  */
-function handleAtRoot (rule, child, after, atruleChilds) {
+function handleAtRoot (rule, child, after, atruleChilds, rootRuleName) {
   let { nodes, params } = child
   const { type, selector, escapeRule } = parseAtRootParams(params)
   if (type === 'withrules') {
     atruleChilds(rule, child, true, !escapeRule('all'))
     after = breakOut(child, after)
   } else if (type === 'unknown') {
-    throw rule.error(`Unknown @at-root parameter ${JSON.stringify(params)}`)
+    throw rule.error(`Unknown @${rootRuleName} parameter ${JSON.stringify(params)}`)
   } else {
     if (selector) {
       // nodes = [new Rule({ selector: selector, nodes })]
@@ -363,6 +364,7 @@ module.exports = (opts = {}) => {
     ],
     opts.unwrap
   )
+  let rootRuleName = (opts.rootRuleName || 'at-root').replace(/^@/,'')
   let preserveEmpty = opts.preserveEmpty
 
   let hasRootRules = false
@@ -373,7 +375,7 @@ module.exports = (opts = {}) => {
     RootExit (root, { }) {
       if (hasRootRules) {
         root.walk((node) => {
-          if (node.type === 'atrule' && node.name === 'at-root') {
+          if (node.type === 'atrule' && node.name === rootRuleName) {
             handleAtRootWithRules(node)
           }
         })
@@ -405,10 +407,10 @@ module.exports = (opts = {}) => {
             after = pickDeclarations(rule.selector, declarations, after, Rule)
             declarations = []
           }
-          if (child.name === 'at-root') {
+          if (child.name === rootRuleName) {
             hasRootRules = true
             unwrapped = true
-            after = handleAtRoot(rule, child, after, atruleChilds)
+            after = handleAtRoot(rule, child, after, atruleChilds, rootRuleName)
           } else if (bubble[child.name]) {
             copyDeclarations = true
             unwrapped = true

@@ -751,4 +751,19 @@ test('third level dependencies #2', () => {
   run('.selector{:global{h2{color:pink}}}', '.selector :global h2{color:pink}')
 })
 
+test('Name of at-root is configurable', () => {
+  const rootRuleName = '_foobar_'
+  run(`a { & {} @${rootRuleName} { b {} } }`, `a {} b {}`, {
+    rootRuleName
+  })
+})
+
+test('The rooRuleName option may start with "@"', () => {
+  const rootRuleName = '@_foobar_'
+  run(`a { & {} ${rootRuleName} { b {} } }`, `a {} b {}`, {
+    rootRuleName
+  })
+})
+
+
 test.run()
