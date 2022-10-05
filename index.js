@@ -20,7 +20,7 @@ let parser = require('postcss-selector-parser')
  * @param {PostcssRule} [rule]
  * @returns {Selector}
  */
- function parse(rawSelector, rule) {
+function parse(rawSelector, rule) {
   /** @type {parser.Root | undefined} */
   let nodes
   let saver = parser(parsed => {
@@ -53,36 +53,38 @@ let parser = require('postcss-selector-parser')
  * @param {Selector} parent
  * @returns {boolean} Indicating whether a replacement took place or not.
  */
-function interpolateAmpInSelecctor (nodes, parent) {
+function interpolateAmpInSelecctor(nodes, parent) {
   let replaced = false
-  nodes.each(/** @type {Node} */ node => {
-    if (node.type === 'nesting') {
-      let clonedParent = parent.clone({})
-      if (node.value !== '&') {
-        node.replaceWith(
-          parse(node.value.replace('&', clonedParent.toString()))
-        )
-      } else {
-        node.replaceWith(clonedParent)
-      }
-      replaced = true
-    } else if ('nodes' in node && node.nodes) {
-      if (interpolateAmpInSelecctor(node, parent)) {
+  nodes.each(
+    /** @type {Node} */ node => {
+      if (node.type === 'nesting') {
+        let clonedParent = parent.clone({})
+        if (node.value !== '&') {
+          node.replaceWith(
+            parse(node.value.replace('&', clonedParent.toString()))
+          )
+        } else {
+          node.replaceWith(clonedParent)
+        }
         replaced = true
+      } else if ('nodes' in node && node.nodes) {
+        if (interpolateAmpInSelecctor(node, parent)) {
+          replaced = true
+        }
       }
     }
-  })
+  )
   return replaced
 }
 
- /**
-  * Combines parent and child selectors, in a SCSS-like way
-  *
-  * @param {PostcssRule} parent
-  * @param {PostcssRule} child
-  * @returns {Array<string>} An array of new, merged selectors
+/**
+ * Combines parent and child selectors, in a SCSS-like way
+ *
+ * @param {PostcssRule} parent
+ * @param {PostcssRule} child
+ * @returns {Array<string>} An array of new, merged selectors
  */
- function mergeSelectors (parent, child) {
+function mergeSelectors(parent, child) {
   /** @type {Array<string>} */
   let merged = []
   parent.selectors.forEach(sel => {
@@ -112,7 +114,7 @@ function interpolateAmpInSelecctor (nodes, parent) {
  * @param {ChildNode} after
  * @returns {ChildNode} updated "after" node
  */
-function breakOut (child, after) {
+function breakOut(child, after) {
   let prev = child.prev()
   after.after(child)
   while (prev && prev.type === 'comment') {
@@ -123,14 +125,14 @@ function breakOut (child, after) {
   return child
 }
 
-function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
+function createFnAtruleChilds(/** @type {RuleMap} */ bubble) {
   /**
    * @param {PostcssRule} rule
    * @param {AtRule} atrule
    * @param {boolean} bubbling
    * @param {boolean} [mergeSels]
    */
-  return function atruleChilds (rule, atrule, bubbling, mergeSels = bubbling) {
+  return function atruleChilds(rule, atrule, bubbling, mergeSels = bubbling) {
     /** @type {Array<ChildNode>} */
     let children = []
     atrule.each(child => {
@@ -162,7 +164,7 @@ function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
  * @param {ChildNode} after
  * @param {RuleConstructor} Rule
  */
-function pickDeclarations (selector, declarations, after, Rule) {
+function pickDeclarations(selector, declarations, after, Rule) {
   let parent = new Rule({
     selector,
     nodes: []
@@ -176,7 +178,7 @@ function pickDeclarations (selector, declarations, after, Rule) {
  * @param {Array<string>} defaults,
  * @param {Array<string>} [custom]
  */
-function atruleNames (defaults, custom) {
+function atruleNames(defaults, custom) {
   /** @type {RuleMap} */
   let list = {}
   for (let name of defaults) {
@@ -197,7 +199,7 @@ function atruleNames (defaults, custom) {
 /** @typedef {AtRootBParams | AtRootWParams | AtRootNParams | AtRootUParams}  AtRootParams */
 
 /** @type {(params: string) => AtRootParams } */
-function parseAtRootParams (params) {
+function parseAtRootParams(params) {
   params = params.trim()
   let braceBlock = params.match(/^\((.*)\)$/)
   if (!braceBlock) {
@@ -221,7 +223,7 @@ function parseAtRootParams (params) {
       escapeRule: rules.all
         ? () => true
         : allowlist
-        ? rule => rule === 'all' ? false : !rules[rule]
+        ? rule => (rule === 'all' ? false : !rules[rule])
         : rule => !!rules[rule]
     }
   }
@@ -233,7 +235,7 @@ function parseAtRootParams (params) {
  * @param {AtRule} leaf
  * @returns {Array<AtRule>}
  */
-function getAncestorRules (leaf) {
+function getAncestorRules(leaf) {
   /** @type {Array<AtRule>} */
   const lineage = []
   /** @type {Container<ChildNode> | ChildNode | Document | undefined} */
@@ -242,18 +244,17 @@ function getAncestorRules (leaf) {
 
   while (parent) {
     if (parent.type === 'atrule') {
-      lineage.push(/** @type {AtRule} */(parent))
+      lineage.push(/** @type {AtRule} */ (parent))
     }
     parent = parent.parent
   }
   return lineage
 }
 
-
 /**
-* @param {AtRule} at_root
-*/
-function handleAtRootWithRules (at_root) {
+ * @param {AtRule} at_root
+ */
+function handleAtRootWithRules(at_root) {
   const { type, escapeRule } = parseAtRootParams(at_root.params)
   if (type !== 'withrules') {
     throw at_root.error('This rule should have been handled during first pass.')
@@ -298,7 +299,7 @@ function handleAtRootWithRules (at_root) {
   if (at_root.next() && topEscaped) {
     /** @type {AtRule | undefined} */
     let restRoot
-    lineage.slice(0, topEscapedIdx +1).forEach((parent, i, arr) => {
+    lineage.slice(0, topEscapedIdx + 1).forEach((parent, i, arr) => {
       const oldRoot = restRoot
       restRoot = parent.clone({ nodes: [] })
       oldRoot && restRoot.append(oldRoot)
@@ -326,14 +327,16 @@ function handleAtRootWithRules (at_root) {
  * @param {{ (rule: PostcssRule, atrule: AtRule, bubbling: boolean, mergeSels?: boolean): void; }} atruleChilds
  * @param {string} rootRuleName
  */
-function handleAtRoot (rule, child, after, atruleChilds, rootRuleName) {
+function handleAtRoot(rule, child, after, atruleChilds, rootRuleName) {
   let { nodes, params } = child
   const { type, selector, escapeRule } = parseAtRootParams(params)
   if (type === 'withrules') {
     atruleChilds(rule, child, true, !escapeRule('all'))
     after = breakOut(child, after)
   } else if (type === 'unknown') {
-    throw rule.error(`Unknown @${rootRuleName} parameter ${JSON.stringify(params)}`)
+    throw rule.error(
+      `Unknown @${rootRuleName} parameter ${JSON.stringify(params)}`
+    )
   } else {
     if (selector) {
       // nodes = [new Rule({ selector: selector, nodes })]
@@ -346,7 +349,6 @@ function handleAtRoot (rule, child, after, atruleChilds, rootRuleName) {
   }
   return after
 }
-
 
 // ---------------------------------------------------------------------------
 
@@ -364,7 +366,7 @@ module.exports = (opts = {}) => {
     ],
     opts.unwrap
   )
-  let rootRuleName = (opts.rootRuleName || 'at-root').replace(/^@/,'')
+  let rootRuleName = (opts.rootRuleName || 'at-root').replace(/^@/, '')
   let preserveEmpty = opts.preserveEmpty
 
   let hasRootRules = false
@@ -372,18 +374,18 @@ module.exports = (opts = {}) => {
   return {
     postcssPlugin: 'postcss-nested',
 
-    RootExit (root, { }) {
+    RootExit(root, {}) {
       if (hasRootRules) {
-        root.walk((node) => {
+        root.walk(node => {
           if (node.type === 'atrule' && node.name === rootRuleName) {
             handleAtRootWithRules(node)
           }
         })
         hasRootRules = false
       }
-  },
+    },
 
-    Rule (rule, { Rule }) {
+    Rule(rule, { Rule }) {
       let unwrapped = false
       /** @type {ChildNode} */
       let after = rule

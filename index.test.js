@@ -306,7 +306,6 @@ test('at-root supports (without: foo) 3', () => {
   )
 })
 
-
 test('at-root supports (without: foo) 4', () => {
   run(
     `@media x {
@@ -764,6 +763,5 @@ test('The rooRuleName option may start with "@"', () => {
     rootRuleName
   })
 })
-
 
 test.run()
