@@ -188,7 +188,7 @@ function atruleNames (defaults, custom) {
 
 /** @type {import('./').Nested} */
 module.exports = (opts = {}) => {
-  let bubble = atruleNames(['media', 'supports'], opts.bubble)
+  let bubble = atruleNames(['media', 'supports', 'layer'], opts.bubble)
   let atruleChilds = createFnAtruleChilds(bubble)
   let unwrap = atruleNames(
     [

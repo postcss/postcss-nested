@@ -6,8 +6,8 @@ import { PluginCreator } from 'postcss'
 declare namespace nested {
   interface Options {
     /**
-     * By default, plugin will bubble only `@media` and `@supports` at-rules.
-     * You can add your custom at-rules to this list by this option.
+     * By default, plugin will bubble only `@media`, `@supports` and `@layer`
+     * at-rules. Use this option to add your custom at-rules to this list.
      */
     bubble?: string[]
 

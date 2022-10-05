@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * ... <!-- Add new lines here. -->
 * fix: Errors when handling sibling `@at-root` rule blocks
 * fix: Move all preceeding comments with rule
-
+* fix: `@layer` blocks should also bubble
 
 ## 5.0.6
 * Fixed custom at-rules nesting (by @bsak-shell).

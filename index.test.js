@@ -728,6 +728,25 @@ test('third level dependencies', () => {
   )
 })
 
+test('bubbles @layer blocks', () => {
+  run(
+    `@media x {
+      a {
+        @layer foo {
+          x:x
+        }
+      }
+    }`,
+    `@media x {
+      @layer foo {
+        a {
+          x:x
+        }
+      }
+    }`
+  )
+})
+
 test('third level dependencies #2', () => {
   run('.selector{:global{h2{color:pink}}}', '.selector :global h2{color:pink}')
 })
