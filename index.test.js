@@ -116,16 +116,17 @@ test('nested at-root with nested media', () => {
     `a {
       & {}
       @at-root {
-      b {
-        @at-root {
-          c {
-            & {}
-          }
-          @media y {
-            d {}
+        b {
+          @at-root {
+            c {
+              & {}
+            }
+            @media y {
+              d {}
+            }
           }
         }
-      }}
+      }
     }`,
     `a {}
     c {}
