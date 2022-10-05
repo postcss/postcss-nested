@@ -52,8 +52,8 @@
   },
   "eslintConfig": {
     "extends": "@logux/eslint-config",
-    "rules":{
-      "prefer-let/prefer-let": false
+    "rules": {
+      "prefer-let/prefer-let": 0
     }
   },
   "c8": {
