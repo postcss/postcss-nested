@@ -105,17 +105,21 @@ function interpolateAmpInSelecctor (nodes, parent) {
 }
 
 /**
- * @param {ChildNode | undefined} comment
+ * Move a child and its preceeding comment(s) to after "after"
+ *
+ * @param {ChildNode} child
  * @param {ChildNode} after
  * @returns {ChildNode} updated "after" node
  */
-function pickComment (comment, after) {
-  if (comment && comment.type === 'comment') {
-    after.after(comment)
-    return comment
-  } else {
-    return after
+function breakOut (child, after) {
+  let prev = child.prev()
+  after.after(child)
+  while (prev && prev.type === 'comment') {
+    let nextPrev = prev.prev()
+    after.after(prev)
+    prev = nextPrev
   }
+  return child
 }
 
 function createFnAtruleChilds (/** @type {RuleMap} */ bubble) {
@@ -218,9 +222,7 @@ module.exports = (opts = {}) => {
           copyDeclarations = true
           unwrapped = true
           child.selectors = mergeSelectors(rule, child)
-          after = pickComment(child.prev(), after)
-          after.after(child)
-          after = child
+          after = breakOut(child, after)
         } else if (child.type === 'atrule') {
           if (declarations.length) {
             after = pickDeclarations(rule.selector, declarations, after, Rule)
@@ -243,16 +245,12 @@ module.exports = (opts = {}) => {
             copyDeclarations = true
             unwrapped = true
             atruleChilds(rule, child, true)
-            after = pickComment(child.prev(), after)
-            after.after(child)
-            after = child
+            after = breakOut(child, after)
           } else if (unwrap[child.name]) {
             copyDeclarations = true
             unwrapped = true
             atruleChilds(rule, child, false)
-            after = pickComment(child.prev(), after)
-            after.after(child)
-            after = child
+            after = breakOut(child, after)
           } else if (copyDeclarations) {
             declarations.push(child)
           }

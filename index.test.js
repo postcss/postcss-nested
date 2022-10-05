@@ -595,7 +595,7 @@ test('clears empty selector after comma', () => {
 })
 
 test('moves comment with rule', () => {
-  run('a { /*B*/ b {} }', '/*B*/ a b {}')
+  run('a { /*B*/ /*B2*/ b {} }', '/*B*/ /*B2*/ a b {}')
 })
 
 test('moves comment with at-rule', () => {
