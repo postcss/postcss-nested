@@ -57,7 +57,7 @@ test('at-root short hand', () => {
   run('a { & {} @at-root b { } }', 'a {} b {}')
 })
 
-test.skip('hoists multiple at-roots', () => {
+test('hoists multiple at-roots', () => {
   run(
     `a {
       b {
@@ -78,7 +78,7 @@ test.skip('hoists multiple at-roots', () => {
   )
 })
 
-test.skip('hoists at-root and media siblings', () => {
+test('hoists at-root and media siblings', () => {
   run(
     `a {
       x: x;

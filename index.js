@@ -243,11 +243,11 @@ module.exports = (opts = {}) => {
 
             let nodes = child.nodes
             if (child.params) {
-              nodes = new Rule({ selector: child.params, nodes })
+              nodes = [new Rule({ selector: child.params, nodes: child.nodes })]
             }
 
             after.after(nodes)
-            after = nodes
+            after = nodes[nodes.length - 1]
             child.remove()
           } else if (bubble[child.name]) {
             copyDeclarations = true

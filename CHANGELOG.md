@@ -1,6 +1,11 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Upcoming...
+* ... <!-- Add new lines here. -->
+* fix: Errors when handling sibling `@at-root` rule blocks
+
+
 ## 5.0.6
 * Fixed custom at-rules nesting (by @bsak-shell).
 
