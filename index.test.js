@@ -222,16 +222,6 @@ test('at-root supports (without: all)', () => {
         }
       }
     }`,
-    /*
-      NOTE: This is different from how SCSS does this.
-      SCSS moves the @at-root breakout block after/below the rest of
-      the subsequent sibling rules, which can sometimes cause quite
-      surprising results.
-
-      Since postcss-nested already does not perfectly emulate SCSS
-      (no pointless @media block splitting and query merging) it seems
-      justifiable to be "better than SCSS" in this case.
-    */
     `@media x {
       @supports (z:y) {
         a {}
@@ -246,19 +236,6 @@ test('at-root supports (without: all)', () => {
             a b {}
       }
     }`
-    /*
-      NOTE: This is effectively what SCSS would produce:
-    */
-    // `@media x {
-    //   @supports (z:y) {
-    //     a {}
-    //     a b {}
-    //   }
-    // }
-    // b {}
-    // @media y {
-    //   c {}
-    // }`
   )
 })
 
@@ -418,16 +395,6 @@ test('at-root supports (without: foo) 5', () => {
         f {}
       }
     }`,
-    /*
-      NOTE: This is different from how SCSS does this.
-      SCSS moves the @at-root breakout block after/below the rest of
-      the subsequent sibling rules, which can sometimes cause quite
-      surprising results.
-
-      Since postcss-nested already does not perfectly emulate SCSS
-      (no pointless @media block splitting and query merging) it seems
-      justifiable to be "better than SCSS" in this case.
-    */
     `@media x {
       @supports (a:b) {
         @media (y) {
@@ -450,23 +417,6 @@ test('at-root supports (without: foo) 5', () => {
         f {}
       }
     }`
-    /*
-      NOTE: This is effectively what SCSS would produce:
-    */
-    // `@media x {
-    //   @supports (a:b) {
-    //     @media (y) {
-    //       @supports (c:d) {
-    //         a {}
-    //         a b {}
-    //         d {}
-    //       }
-    //     }
-    //   @media (y) {
-    //     a b {}
-    //   }
-    //   e {}
-    // }`
   )
 })
 
