@@ -350,6 +350,8 @@ function handleAtRoot(rule, child, after, atruleChilds, rootRuleName) {
   return after
 }
 
+const hasRootRule = Symbol('hasRootRule')
+
 // ---------------------------------------------------------------------------
 
 /** @type {import('./').Nested} */
@@ -373,11 +375,14 @@ module.exports = (opts = {}) => {
     postcssPlugin: 'postcss-nested',
 
     RootExit(root) {
-      root.walk(node => {
-        if (node.type === 'atrule' && node.name === rootRuleName) {
-          handleAtRootWithRules(node)
-        }
-      })
+      if (root[hasRootRule]) {
+        root.walk(node => {
+          if (node.type === 'atrule' && node.name === rootRuleName) {
+            handleAtRootWithRules(node)
+          }
+        })
+        root[hasRootRule] = false
+      }
     },
 
     Rule(rule, { Rule }) {
@@ -405,6 +410,7 @@ module.exports = (opts = {}) => {
             declarations = []
           }
           if (child.name === rootRuleName) {
+            child.root()[hasRootRule] = true
             unwrapped = true
             after = handleAtRoot(rule, child, after, atruleChilds, rootRuleName)
           } else if (bubble[child.name]) {
