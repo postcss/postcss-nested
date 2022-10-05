@@ -22,18 +22,12 @@ let parser = require('postcss-selector-parser')
  * @returns {Selector}
  */
 function parse(rawSelector, rule) {
-  /** @type {parser.Root | undefined} */
+  /** @type {Root | undefined} */
   let nodes
-  let saver = parser(parsed => {
-    nodes = parsed
-  })
   try {
-    saver.processSync(rawSelector)
-    if (typeof nodes === 'undefined') {
-      // Should never happen but @ts-check can't deduce the side-effect
-      // triggered by `saver.processSync(str)`
-      throw new Error('Parsing failed')
-    }
+    parser(parsed => {
+      nodes = parsed
+    }).processSync(rawSelector)
   } catch (e) {
     if (rawSelector.includes(':')) {
       throw rule ? rule.error('Missed semicolon') : e
@@ -41,7 +35,9 @@ function parse(rawSelector, rule) {
       throw rule ? rule.error(e.message) : e
     }
   }
-  return nodes.at(0)
+  // Should be safe, but @ts-check can't deduce the side-effect
+  // triggered by `saver.processSync(str)`
+  return /** @type {Root} */ (nodes).at(0)
 }
 
 /**
