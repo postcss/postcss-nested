@@ -26,9 +26,9 @@ declare namespace nested {
     preserveEmpty?: boolean
 
     /**
-     * The plugin supports the SCSS custom at-rule `@at-root` which
-     * rule blocks out of the nesting. If you want you can choose a
-     * new custom name for this rule.
+     * The plugin supports the SCSS custom at-rule `@at-root` which breaks
+     * rule blocks out of their nested position. If you want, you can choose
+     * a new custom name for this rule in your code.
      */
     rootRuleName?: string
   }
