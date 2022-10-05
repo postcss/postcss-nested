@@ -373,11 +373,9 @@ module.exports = (opts = {}) => {
     postcssPlugin: 'postcss-nested',
 
     Once(root) {
-      root.walk(node => {
-        if (node.type === 'atrule' && node.name === rootRuleName) {
-          normalizeRootRule(node)
-          root[hasRootRule] = true
-        }
+      root.walkAtRules(rootRuleName, node => {
+        normalizeRootRule(node)
+        root[hasRootRule] = true
       })
     },
 
@@ -439,11 +437,7 @@ module.exports = (opts = {}) => {
 
     RootExit(root) {
       if (root[hasRootRule]) {
-        root.walk(node => {
-          if (node.type === 'atrule' && node.name === rootRuleName) {
-            unwrapRootRule(node)
-          }
-        })
+        root.walkAtRules(rootRuleName, unwrapRootRule)
         root[hasRootRule] = false
       }
     }
