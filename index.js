@@ -54,7 +54,7 @@ function parse(rawSelector, rule) {
  * @param {Selector} parent
  * @returns {boolean} Indicating whether a replacement took place or not.
  */
-function interpolateAmpInSelecctor(nodes, parent) {
+function interpolateAmpInSelector(nodes, parent) {
   let replaced = false
   nodes.each(
     /** @type {Node} */ node => {
@@ -69,7 +69,7 @@ function interpolateAmpInSelecctor(nodes, parent) {
         }
         replaced = true
       } else if ('nodes' in node && node.nodes) {
-        if (interpolateAmpInSelecctor(node, parent)) {
+        if (interpolateAmpInSelector(node, parent)) {
           replaced = true
         }
       }
@@ -96,11 +96,12 @@ function mergeSelectors(parent, child) {
         return
       }
       let node = parse(selector, child)
-      let replaced = interpolateAmpInSelecctor(node, parentNode)
+      let replaced = interpolateAmpInSelector(node, parentNode)
       if (!replaced) {
-        // FIXME: Resolve these @ts-check errors somehow.
-        node.prepend(parser.combinator({ value: ' ' }))
-        node.prepend(parentNode.clone({}))
+        // NOTE: The type definitions for `postcss-selector-parser` seem to be
+        // badly outdated.
+        node.prepend(/** @type {any} */ (parser.combinator({ value: ' ' })))
+        node.prepend(/** @type {Selector} */ (parentNode.clone({})))
       }
       merged.push(node.toString())
     })
@@ -448,7 +449,6 @@ module.exports = (opts = {}) => {
           }
         })
         root[hasRootRule] = false
-        console.log('-----------------------------------\n', root.toString())
       }
     }
   }
