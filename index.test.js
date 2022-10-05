@@ -57,12 +57,347 @@ test('at-root short hand', () => {
   run('a { & {} @at-root b { } }', 'a {} b {}')
 })
 
+test.skip('hoists multiple at-roots', () => {
+  run(
+    `a {
+      b {
+        & {}
+        @at-root {
+          c1 {}
+          c2 {}
+        }
+        @at-root {
+          d {}
+        }
+      }
+    }`,
+    `a b {}
+    c1 {}
+    c2 {}
+    d {}`
+  )
+})
+
+test.skip('hoists at-root and media siblings', () => {
+  run(
+    `a {
+      x: x;
+      a2 {}
+      @at-root {
+        b {}
+      }
+      @media x {
+        c {}
+      }
+      /* asdadf */
+    }`,
+    `a {
+      x: x;
+      /* asdadf */
+    }
+    a a2 {}
+    b {}
+    @media x {
+      a c {}
+    }`
+  )
+})
+
 test('at-root stops at media', () => {
   run('@media x { a { & {} @at-root { b { } } } }', '@media x { a {} b {} }')
 })
 
 test('at-root unwraps nested media', () => {
   run('a { & {} @media x { @at-root { b { } } } }', 'a {} @media x { b {} }')
+})
+
+test.skip('nested at-root with nested media', () => {
+  run(
+    `a {
+      & {}
+      @at-root {
+      b {
+        @at-root {
+          c {
+            & {}
+          }
+          @media y {
+            d {}
+          }
+        }
+      }}
+    }`,
+    `a {}
+    c {}
+    @media y {
+      d {}
+    }`
+  )
+})
+
+test.skip('at-root supports (without: all)', () => {
+  run(
+    `@media x {
+      @supports (z:y) {
+        a {
+          & {}
+          @at-root (without: all) {
+            b {}
+            @media y {
+              c {}
+            }
+          }
+          b {}
+        }
+      }
+    }`,
+    /*
+      NOTE: This is different from how SCSS does this.
+      SCSS moves the @at-root breakout block after/below the rest of
+      the subsequent sibling rules, which can sometimes cause quite
+      surprising results.
+
+      Since postcss-nested already does not perfectly emulate SCSS
+      (no pointless @media block splitting and query merging) it seems
+      justifiable to be "better than SCSS" in this case.
+    */
+    `@media x {
+      @supports (z:y) {
+        a {}
+      }
+    }
+    b {}
+    @media y {
+      c {}
+    }
+    @media x {
+      @supports (z:y) {
+            a b {}
+      }
+    }`
+    /*
+      NOTE: This is effectively what SCSS would produce:
+    */
+    // `@media x {
+    //   @supports (z:y) {
+    //     a {}
+    //     a b {}
+    //   }
+    // }
+    // b {}
+    // @media y {
+    //   c {}
+    // }`
+  )
+})
+
+test.skip('at-root supports (with: all)', () => {
+  run(
+    `@media x {
+      @supports (z:y) {
+        a {
+          & {}
+          @at-root (with: all) {
+            b {}
+            @media y {
+              c {}
+            }
+            @media z {
+              & {}
+            }
+          }
+        }
+      }
+    }`,
+    `@media x {
+      @supports (z:y) {
+        a {}
+        a b {}
+        @media y {
+          a c {}
+        }
+        @media z {
+          a {}
+        }
+      }
+    }`
+  )
+})
+
+test.skip('at-root supports (without: foo)', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root (without: media) {
+          b {}
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    a b {}`
+  )
+})
+
+test.skip('at-root supports (without: foo) 2', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+      a c {}
+    }`
+  )
+})
+
+test.skip('at-root supports (with: foo)', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (with: supports) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+      a c {}
+    }`
+  )
+})
+
+test.skip('at-root supports (without: foo) 3', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (without: supports) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+    }
+    @media x {
+      a c {}
+    }`
+  )
+})
+
+
+test.skip('at-root supports (without: foo) 4', () => {
+  run(
+    `@media x {
+      @supports (y:z) {
+        a {
+          & {}
+          @at-root (without: supports) {
+            b {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      @supports (y:z) {
+        a {}
+      }
+      a b {}
+    }`
+  )
+})
+
+test.skip('at-root supports (without: foo) 5', () => {
+  run(
+    `@media x {
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a {
+              & {}
+              @at-root (without: supports) {
+                b {}
+              }
+              c {}
+            }
+            d {}
+          }
+        }
+        e {}
+        f {}
+      }
+    }`,
+    /*
+      NOTE: This is different from how SCSS does this.
+      SCSS moves the @at-root breakout block after/below the rest of
+      the subsequent sibling rules, which can sometimes cause quite
+      surprising results.
+
+      Since postcss-nested already does not perfectly emulate SCSS
+      (no pointless @media block splitting and query merging) it seems
+      justifiable to be "better than SCSS" in this case.
+    */
+    `@media x {
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a {}
+          }
+        }
+      }
+      @media (y) {
+        a b {}
+      }
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a c {}
+            d {}
+          }
+        }
+        e {}
+        f {}
+      }
+    }`
+    /*
+      NOTE: This is effectively what SCSS would produce:
+    */
+    // `@media x {
+    //   @supports (a:b) {
+    //     @media (y) {
+    //       @supports (c:d) {
+    //         a {}
+    //         a b {}
+    //         d {}
+    //       }
+    //     }
+    //   @media (y) {
+    //     a b {}
+    //   }
+    //   e {}
+    // }`
+  )
 })
 
 test('replaces ampersand', () => {
@@ -140,6 +475,35 @@ test('leaves nested @media blocks as is', () => {
           a b { a: 1 }
         }
       }
+    }`
+  )
+})
+
+test.skip('@at-root fully espacpes nested @media blocks', () => {
+  run(
+    `a { x: 3 }
+    a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            x: 2;
+            @at-root (without: media) {
+              @media (min-width: 50rem) {
+                x: 1;
+              }
+            }
+          }
+        }
+      }
+    }`,
+    `a { x: 3 }
+    @media screen {
+      @media (max-width: 100rem) {
+        a b { x: 2; }
+      }
+    }
+    @media (min-width: 50rem) {
+      a b { x: 1 }
     }`
   )
 })
@@ -348,6 +712,13 @@ test('shows clear errors on other errors', () => {
   throws(() => {
     css = postcss([plugin]).process(css, { from: undefined }).css
   }, ':2:3: Unexpected')
+})
+
+test.skip('errors on unknown @at-root parameters', () => {
+  let css = 'a {\n  @at-root (wonky: "blah") {\n    b {}\n  }\n}'
+  throws(() => {
+    css = postcss([plugin]).process(css, { from: undefined }).css
+  }, ':2:3: Unknown @at-root parameter "(wonky: \\"blah\\")"')
 })
 
 test('third level dependencies', () => {
