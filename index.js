@@ -369,20 +369,15 @@ module.exports = (opts = {}) => {
   let rootRuleName = (opts.rootRuleName || 'at-root').replace(/^@/, '')
   let preserveEmpty = opts.preserveEmpty
 
-  let hasRootRules = false
-
   return {
     postcssPlugin: 'postcss-nested',
 
-    RootExit(root, {}) {
-      if (hasRootRules) {
-        root.walk(node => {
-          if (node.type === 'atrule' && node.name === rootRuleName) {
-            handleAtRootWithRules(node)
-          }
-        })
-        hasRootRules = false
-      }
+    RootExit(root) {
+      root.walk(node => {
+        if (node.type === 'atrule' && node.name === rootRuleName) {
+          handleAtRootWithRules(node)
+        }
+      })
     },
 
     Rule(rule, { Rule }) {
@@ -410,7 +405,6 @@ module.exports = (opts = {}) => {
             declarations = []
           }
           if (child.name === rootRuleName) {
-            hasRootRules = true
             unwrapped = true
             after = handleAtRoot(rule, child, after, atruleChilds, rootRuleName)
           } else if (bubble[child.name]) {
