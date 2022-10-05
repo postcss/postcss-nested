@@ -136,6 +136,76 @@ test('nested at-root with nested media', () => {
   )
 })
 
+test('tolerates immediately nested at-root', () => {
+  run(
+    `a {
+      & {}
+      @at-root {
+        @at-root foo {
+          c {}
+        }
+      }
+    }`,
+    `a {}
+    foo c {}`
+  )
+})
+
+test('tolerates top-level at-root', () => {
+  run(
+    `@at-root {
+      a {}
+    }
+    @media x {
+      @at-root {
+        b {}
+      }
+    }`,
+    `a {}
+    @media x {
+      b {}
+    }`
+  )
+})
+
+test('tolerates immediately nested at-root #2', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root {
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    c {}`
+  )
+})
+
+test('tolerates immediately nested at-root #3', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root (without: media) {
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    a c {}`
+  )
+})
+
 test('at-root supports (without: all)', () => {
   run(
     `@media x {
