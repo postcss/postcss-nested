@@ -1,4 +1,5 @@
 // @ts-check
+const { Rule } = require('postcss')
 let parser = require('postcss-selector-parser')
 
 /** @typedef {import('postcss').Container}  Container */
@@ -125,12 +126,14 @@ function breakOut(child, after) {
   return child
 }
 
-function createFnAtruleChilds(/** @type {RuleMap} */ bubble) {
+/**
+ * @param {RuleMap} bubble
+ */
+function createFnAtruleChilds(bubble) {
   /**
    * @param {PostcssRule} rule
    * @param {AtRule} atrule
    * @param {boolean} bubbling
-   * @param {boolean} [mergeSels]
    */
   return function atruleChilds(rule, atrule, bubbling, mergeSels = bubbling) {
     /** @type {Array<ChildNode>} */
@@ -140,8 +143,12 @@ function createFnAtruleChilds(/** @type {RuleMap} */ bubble) {
         if (mergeSels) {
           child.selectors = mergeSelectors(rule, child)
         }
-      } else if (child.type === 'atrule' && child.nodes && bubble[child.name]) {
-        atruleChilds(rule, child, mergeSels)
+      } else if (child.type === 'atrule' && child.nodes) {
+        if (bubble[child.name]) {
+          atruleChilds(rule, child, mergeSels)
+        } else if (atrule[rootRuleMergeSel] !== false) {
+          children.push(child)
+        }
       } else {
         children.push(child)
       }
@@ -192,14 +199,14 @@ function atruleNames(defaults, custom) {
   return list
 }
 
-/** @typedef {{ type: 'basic', selector?: string, escapeRule?: never }}  AtRootBParams */
-/** @typedef {{ type: 'withrules', escapeRule: (rule: string) => boolean, selector?: never }}  AtRootWParams */
-/** @typedef {{ type: 'unknown', selector?: never, escapeRule?: never }}  AtRootUParams */
-/** @typedef {{ type: 'noop', selector?: never, escapeRule?: never }}  AtRootNParams */
+/** @typedef {{ type: 'basic', selector?: string, escapes?: never }}  AtRootBParams */
+/** @typedef {{ type: 'withrules', escapes: (rule: string) => boolean, selector?: never }}  AtRootWParams */
+/** @typedef {{ type: 'unknown', selector?: never, escapes?: never }}  AtRootUParams */
+/** @typedef {{ type: 'noop', selector?: never, escapes?: never }}  AtRootNParams */
 /** @typedef {AtRootBParams | AtRootWParams | AtRootNParams | AtRootUParams}  AtRootParams */
 
 /** @type {(params: string) => AtRootParams } */
-function parseAtRootParams(params) {
+function parseRootRuleParams(params) {
   params = params.trim()
   let braceBlock = params.match(/^\((.*)\)$/)
   if (!braceBlock) {
@@ -220,7 +227,7 @@ function parseAtRootParams(params) {
     }
     return {
       type: 'withrules',
-      escapeRule: rules.all
+      escapes: rules.all
         ? () => true
         : allowlist
         ? rule => (rule === 'all' ? false : !rules[rule])
@@ -252,102 +259,96 @@ function getAncestorRules(leaf) {
 }
 
 /**
- * @param {AtRule} at_root
+ * @param {AtRule} rule
  */
-function handleAtRootWithRules(at_root) {
-  const { type, escapeRule } = parseAtRootParams(at_root.params)
-  if (type !== 'withrules') {
-    throw at_root.error('This rule should have been handled during first pass.')
-  }
+function unwrapRootRule(rule) {
+  const escapes = rule[rootRuleEscapes]
 
-  const nodes = at_root.nodes
-
-  /** @type {AtRule | undefined} */
-  let topEscaped
-  let topEscapedIdx = -1
-  /** @type {AtRule | undefined} */
-  let breakoutLeaf
-  /** @type {AtRule | undefined} */
-  let breakoutRoot
-  /** @type {AtRule | undefined} */
-  let clone
-
-  const lineage = getAncestorRules(at_root)
-  lineage.forEach((parent, i) => {
-    if (escapeRule(parent.name)) {
-      topEscaped = parent
-      topEscapedIdx = i
-      breakoutRoot = clone
-    } else {
-      const oldClone = clone
-      clone = parent.clone({ nodes: [] })
-      oldClone && clone.append(oldClone)
-      breakoutLeaf = breakoutLeaf || clone
-    }
-  })
-
-  if (!topEscaped) {
-    at_root.after(nodes)
-  } else if (!breakoutRoot) {
-    topEscaped.after(nodes)
+  if (!escapes) {
+    rule.after(rule.nodes)
   } else {
-    const leaf = /** @type {AtRule} */ (breakoutLeaf)
-    leaf.append(nodes)
-    topEscaped.after(breakoutRoot)
-  }
+    const nodes = rule.nodes
 
-  if (at_root.next() && topEscaped) {
     /** @type {AtRule | undefined} */
-    let restRoot
-    lineage.slice(0, topEscapedIdx + 1).forEach((parent, i, arr) => {
-      const oldRoot = restRoot
-      restRoot = parent.clone({ nodes: [] })
-      oldRoot && restRoot.append(oldRoot)
+    let topEscaped
+    let topEscapedIdx = -1
+    /** @type {AtRule | undefined} */
+    let breakoutLeaf
+    /** @type {AtRule | undefined} */
+    let breakoutRoot
+    /** @type {AtRule | undefined} */
+    let clone
 
-      /** @type {Array<ChildNode>} */
-      let nextSibs = []
-      let _child = arr[i - 1] || at_root
-      let next = _child.next()
-      while (next) {
-        nextSibs.push(next)
-        next = next.next()
+    const lineage = getAncestorRules(rule)
+    lineage.forEach((parent, i) => {
+      if (escapes(parent.name)) {
+        topEscaped = parent
+        topEscapedIdx = i
+        breakoutRoot = clone
+      } else {
+        const oldClone = clone
+        clone = parent.clone({ nodes: [] })
+        oldClone && clone.append(oldClone)
+        breakoutLeaf = breakoutLeaf || clone
       }
-      restRoot.append(nextSibs)
     })
-    restRoot && (breakoutRoot || nodes[nodes.length - 1]).after(restRoot)
+
+    if (!topEscaped) {
+      rule.after(nodes)
+    } else if (!breakoutRoot) {
+      topEscaped.after(nodes)
+    } else {
+      const leaf = /** @type {AtRule} */ (breakoutLeaf)
+      leaf.append(nodes)
+      topEscaped.after(breakoutRoot)
+    }
+
+    if (rule.next() && topEscaped) {
+      /** @type {AtRule | undefined} */
+      let restRoot
+      lineage.slice(0, topEscapedIdx + 1).forEach((parent, i, arr) => {
+        const oldRoot = restRoot
+        restRoot = parent.clone({ nodes: [] })
+        oldRoot && restRoot.append(oldRoot)
+
+        /** @type {Array<ChildNode>} */
+        let nextSibs = []
+        let _child = arr[i - 1] || rule
+        let next = _child.next()
+        while (next) {
+          nextSibs.push(next)
+          next = next.next()
+        }
+        restRoot.append(nextSibs)
+      })
+      restRoot && (breakoutRoot || nodes[nodes.length - 1]).after(restRoot)
+    }
   }
 
-  at_root.remove()
+  rule.remove()
 }
 
+const rootRuleMergeSel = Symbol('rootRuleMergeSel')
+const rootRuleEscapes = Symbol('rootRuleEscapes')
+
 /**
- * @param {PostcssRule} rule
- * @param {AtRule} child
- * @param {ChildNode} after
- * @param {{ (rule: PostcssRule, atrule: AtRule, bubbling: boolean, mergeSels?: boolean): void; }} atruleChilds
- * @param {string} rootRuleName
+ * @param {AtRule} rule
  */
-function handleAtRoot(rule, child, after, atruleChilds, rootRuleName) {
-  let { nodes, params } = child
-  const { type, selector, escapeRule } = parseAtRootParams(params)
-  if (type === 'withrules') {
-    atruleChilds(rule, child, true, !escapeRule('all'))
-    after = breakOut(child, after)
-  } else if (type === 'unknown') {
+function normalizeRootRule(rule) {
+  let { params } = rule
+  const { type, selector, escapes } = parseRootRuleParams(params)
+  if (type === 'unknown') {
     throw rule.error(
-      `Unknown @${rootRuleName} parameter ${JSON.stringify(params)}`
+      `Unknown @${rule.name} parameter ${JSON.stringify(params)}`
     )
-  } else {
-    if (selector) {
-      // nodes = [new Rule({ selector: selector, nodes })]
-      nodes = [rule.clone({ selector, nodes })]
-    }
-    atruleChilds(rule, child, true, type === 'noop')
-    after.after(nodes)
-    after = nodes[nodes.length - 1]
-    child.remove()
   }
-  return after
+  if (type === 'basic' && selector) {
+    let selectorBlock = new Rule({ selector: selector, nodes: rule.nodes })
+    rule.removeAll()
+    rule.append(selectorBlock)
+  }
+  rule[rootRuleEscapes] = escapes
+  rule[rootRuleMergeSel] = escapes ? !escapes('all') : type === 'noop'
 }
 
 const hasRootRule = Symbol('hasRootRule')
@@ -374,15 +375,13 @@ module.exports = (opts = {}) => {
   return {
     postcssPlugin: 'postcss-nested',
 
-    RootExit(root) {
-      if (root[hasRootRule]) {
-        root.walk(node => {
-          if (node.type === 'atrule' && node.name === rootRuleName) {
-            handleAtRootWithRules(node)
-          }
-        })
-        root[hasRootRule] = false
-      }
+    Once(root) {
+      root.walk(node => {
+        if (node.type === 'atrule' && node.name === rootRuleName) {
+          normalizeRootRule(node)
+          root[hasRootRule] = true
+        }
+      })
     },
 
     Rule(rule, { Rule }) {
@@ -410,9 +409,9 @@ module.exports = (opts = {}) => {
             declarations = []
           }
           if (child.name === rootRuleName) {
-            child.root()[hasRootRule] = true
             unwrapped = true
-            after = handleAtRoot(rule, child, after, atruleChilds, rootRuleName)
+            atruleChilds(rule, child, true, child[rootRuleMergeSel])
+            after = breakOut(child, after)
           } else if (bubble[child.name]) {
             copyDeclarations = true
             unwrapped = true
@@ -438,6 +437,18 @@ module.exports = (opts = {}) => {
       if (unwrapped && preserveEmpty !== true) {
         rule.raws.semicolon = true
         if (rule.nodes.length === 0) rule.remove()
+      }
+    },
+
+    RootExit(root) {
+      if (root[hasRootRule]) {
+        root.walk(node => {
+          if (node.type === 'atrule' && node.name === rootRuleName) {
+            unwrapRootRule(node)
+          }
+        })
+        root[hasRootRule] = false
+        console.log('-----------------------------------\n', root.toString())
       }
     }
   }
