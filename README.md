@@ -119,8 +119,8 @@ module.exports = {
 
 ### `bubble`
 
-By default, plugin will bubble only `@media` and `@supports` at-rules.
-You can add your custom at-rules to this list by `bubble` option:
+By default, plugin will bubble only `@media`, `@supports` and `@layer`
+at-rules. Use this option to add your custom at-rules to this list.
 
 ```js
 postcss([ require('postcss-nested')({ bubble: ['phone'] }) ])
@@ -196,3 +196,27 @@ Will be compiled to:
 ```
 
 This is especially useful if you want to export the empty classes with `postcss-modules`.
+
+
+### `rootRuleName`
+
+The plugin supports the SCSS custom at-rule `@at-root` which breaks rule
+blocks out of their nested position. If you want, you can choose a new
+custom name for this rule in your code.
+
+```js
+postcss([ require('postcss-nested')({ rootRuleName: '_escape-nesting' }) ])
+```
+
+```css
+/* input */
+.a {
+  color: white;
+  @_escape-nesting {
+    .b { color: black; }
+  }
+}
+/* output */
+.a { color: white; }
+.b { color: black; }
+```

@@ -6,8 +6,8 @@ import { PluginCreator } from 'postcss'
 declare namespace nested {
   interface Options {
     /**
-     * By default, plugin will bubble only `@media` and `@supports` at-rules.
-     * You can add your custom at-rules to this list by this option.
+     * By default, plugin will bubble only `@media`, `@supports` and `@layer`
+     * at-rules. Use this option to add your custom at-rules to this list.
      */
     bubble?: string[]
 
@@ -24,6 +24,13 @@ declare namespace nested {
      * to preserve them.
      */
     preserveEmpty?: boolean
+
+    /**
+     * The plugin supports the SCSS custom at-rule `@at-root` which breaks
+     * rule blocks out of their nested position. If you want, you can choose
+     * a new custom name for this rule in your code.
+     */
+    rootRuleName?: string
   }
 
   type Nested = PluginCreator<Options>

@@ -1,12 +1,30 @@
+// @ts-check
 let { equal, throws } = require('uvu/assert')
 let { test } = require('uvu')
-let postcss = require('postcss')
+let postcss = require('postcss').default
 
 let plugin = require('./')
 
+/**
+ * @param {string} css
+ * @returns {string}
+ */
+function normalise(css) {
+  return css
+    .replace(/([:;{}]|\*\/|\/\*)/g, ' $1 ')
+    .replace(/\s\s+/g, ' ')
+    .replace(/ ([;:])/g, '$1')
+    .trim()
+}
+
+/**
+ * @param {string} input
+ * @param {string} output
+ * @param {plugin.Options | undefined} [opts]
+ */
 function run(input, output, opts) {
   let result = postcss([plugin(opts)]).process(input, { from: '/test.css' })
-  equal(result.css, output)
+  equal(normalise(result.css), normalise(output))
   equal(result.warnings().length, 0)
 }
 
@@ -31,8 +49,375 @@ test('hoists at-root', () => {
   run('a { & {} @at-root { b {} } }', 'a {} b {}')
 })
 
+test('hoists at-root 2', () => {
+  run('a { @at-root { b {} } }', 'b {}')
+})
+
 test('at-root short hand', () => {
   run('a { & {} @at-root b { } }', 'a {} b {}')
+})
+
+test('hoists multiple at-roots', () => {
+  run(
+    `a {
+      b {
+        & {}
+        @at-root {
+          c1 {}
+          c2 {}
+        }
+        @at-root {
+          d {}
+        }
+      }
+    }`,
+    `a b {}
+    c1 {}
+    c2 {}
+    d {}`
+  )
+})
+
+test('hoists at-root and media siblings', () => {
+  run(
+    `a {
+      x: x;
+      a2 {}
+      @at-root {
+        b {}
+      }
+      @media x {
+        c {}
+      }
+      /* asdadf */
+    }`,
+    `a {
+      x: x;
+      /* asdadf */
+    }
+    a a2 {}
+    b {}
+    @media x {
+      a c {}
+    }`
+  )
+})
+
+test('at-root stops at media', () => {
+  run('@media x { a { & {} @at-root { b { } } } }', '@media x { a {} b {} }')
+})
+
+test('at-root unwraps nested media', () => {
+  run('a { & {} @media x { @at-root { b { } } } }', 'a {} @media x { b {} }')
+})
+
+test('nested at-root with nested media', () => {
+  run(
+    `a {
+      & {}
+      @at-root {
+        b {
+          @at-root {
+            c {
+              & {}
+            }
+            @media y {
+              d {}
+            }
+          }
+        }
+      }
+    }`,
+    `a {}
+    c {}
+    @media y {
+      d {}
+    }`
+  )
+})
+
+test('tolerates immediately nested at-root', () => {
+  run(
+    `a {
+      & {}
+      @at-root {
+        @at-root foo {
+          c {}
+        }
+      }
+    }`,
+    `a {}
+    foo c {}`
+  )
+})
+
+test('tolerates top-level at-root', () => {
+  run(
+    `@at-root {
+      a {}
+    }
+    @media x {
+      @at-root {
+        b {}
+      }
+    }`,
+    `a {}
+    @media x {
+      b {}
+    }`
+  )
+})
+
+test('tolerates immediately nested at-root #2', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root {
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    c {}`
+  )
+})
+
+test('tolerates immediately nested at-root #3', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root (without: media) {
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    a c {}`
+  )
+})
+
+test('at-root supports (without: all)', () => {
+  run(
+    `@media x {
+      @supports (z:y) {
+        a {
+          & {}
+          @at-root (without: all) {
+            b {}
+            @media y {
+              c {}
+            }
+          }
+          b {}
+        }
+      }
+    }`,
+    `@media x {
+      @supports (z:y) {
+        a {}
+      }
+    }
+    b {}
+    @media y {
+      c {}
+    }
+    @media x {
+      @supports (z:y) {
+            a b {}
+      }
+    }`
+  )
+})
+
+test('at-root supports (with: all)', () => {
+  run(
+    `@media x {
+      @supports (z:y) {
+        a {
+          & {}
+          @at-root (with: all) {
+            b {}
+            @media y {
+              c {}
+            }
+            @media z {
+              & {}
+            }
+          }
+        }
+      }
+    }`,
+    `@media x {
+      @supports (z:y) {
+        a {}
+        a b {}
+        @media y {
+          a c {}
+        }
+        @media z {
+          a {}
+        }
+      }
+    }`
+  )
+})
+
+test('at-root supports (without: foo)', () => {
+  run(
+    `@media x {
+      a {
+        & {}
+        @at-root (without: media) {
+          b {}
+        }
+      }
+    }`,
+    `@media x {
+      a {}
+    }
+    a b {}`
+  )
+})
+
+test('at-root supports (without: foo) 2', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (without: media) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+      a c {}
+    }`
+  )
+})
+
+test('at-root supports (with: foo)', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (with: supports) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+      a c {}
+    }`
+  )
+})
+
+test('at-root supports (without: foo) 3', () => {
+  run(
+    `@supports (y:z) {
+      @media x {
+        a {
+          b {}
+          @at-root (without: supports) {
+            c {}
+          }
+        }
+      }
+    }`,
+    `@supports (y:z) {
+      @media x {
+        a b {}
+      }
+    }
+    @media x {
+      a c {}
+    }`
+  )
+})
+
+test('at-root supports (without: foo) 4', () => {
+  run(
+    `@media x {
+      @supports (y:z) {
+        a {
+          & {}
+          @at-root (without: supports) {
+            b {}
+          }
+        }
+      }
+    }`,
+    `@media x {
+      @supports (y:z) {
+        a {}
+      }
+      a b {}
+    }`
+  )
+})
+
+test('at-root supports (without: foo) 5', () => {
+  run(
+    `@media x {
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a {
+              & {}
+              @at-root (without: supports) {
+                b {}
+              }
+              c {}
+            }
+            d {}
+          }
+        }
+        e {}
+        f {}
+      }
+    }`,
+    `@media x {
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a {}
+          }
+        }
+      }
+      @media (y) {
+        a b {}
+      }
+      @supports (a:b) {
+        @media (y) {
+          @supports (c:d) {
+            a c {}
+            d {}
+          }
+        }
+        e {}
+        f {}
+      }
+    }`
+  )
 })
 
 test('replaces ampersand', () => {
@@ -86,6 +471,89 @@ test('unwraps at-rules', () => {
   run(
     'a { a: 1 } a { @media screen { @supports (a: 1) { a: 1 } } }',
     'a { a: 1 } @media screen { @supports (a: 1) { a { a: 1 } } }'
+  )
+})
+
+test('leaves nested @media blocks as is', () => {
+  run(
+    `a { a: 1 }
+    a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            @media (min-width: 50rem) {
+              a: 1
+            }
+          }
+        }
+      }
+    }`,
+    `a { a: 1 }
+    @media screen {
+      @media (max-width: 100rem) {
+        @media (min-width: 50rem) {
+          a b { a: 1 }
+        }
+      }
+    }`
+  )
+})
+
+test('@at-root fully espacpes nested @media blocks', () => {
+  run(
+    `a { x: 3 }
+    a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            x: 2;
+            @at-root (without: media) {
+              @media (min-width: 50rem) {
+                x: 1;
+              }
+            }
+          }
+        }
+      }
+    }`,
+    `a { x: 3 }
+    @media screen {
+      @media (max-width: 100rem) {
+        a b { x: 2; }
+      }
+    }
+    @media (min-width: 50rem) {
+      a b { x: 1 }
+    }`
+  )
+})
+
+test('Multi nested @media is resolved', () => {
+  run(
+    `a {
+      @media screen {
+        b {
+          @media (max-width: 100rem) {
+            y: y;
+            c {
+              @media (min-width: 50rem) {
+                x: x
+              }
+            }
+          }
+        }
+      }
+    }`,
+    `@media screen {
+      @media (max-width: 100rem) {
+        a b {
+          y: y
+        }
+        @media (min-width: 50rem) {
+          a b c { x:x }
+        }
+      }
+    }`
   )
 })
 
@@ -147,7 +615,7 @@ test('clears empty selector after comma', () => {
 })
 
 test('moves comment with rule', () => {
-  run('a { /*B*/ b {} }', '/*B*/ a b {}')
+  run('a { /*B*/ /*B2*/ b {} }', '/*B*/ /*B2*/ a b {}')
 })
 
 test('moves comment with at-rule', () => {
@@ -226,7 +694,7 @@ test('works with other visitors', () => {
       }
     }
   }
-  mixinPlugin.postcss = true
+  mixinPlugin.postcss = /** @type {const} */ (true)
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css
@@ -245,7 +713,7 @@ test('works with other visitors #2', () => {
       }
     }
   }
-  mixinPlugin.postcss = true
+  mixinPlugin.postcss = /** @type {const} */ (true)
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css
@@ -266,6 +734,13 @@ test('shows clear errors on other errors', () => {
   }, ':2:3: Unexpected')
 })
 
+test('errors on unknown @at-root parameters', () => {
+  let css = 'a {\n  @at-root (wonky: "blah") {\n    b {}\n  }\n}'
+  throws(() => {
+    css = postcss([plugin]).process(css, { from: undefined }).css
+  }, ':2:3: Unknown @at-root parameter "(wonky: \\"blah\\")"')
+})
+
 test('third level dependencies', () => {
   run(
     '.text {&:hover{border-color: red;&:before{color: red;}}}',
@@ -273,8 +748,41 @@ test('third level dependencies', () => {
   )
 })
 
+test('bubbles @layer blocks', () => {
+  run(
+    `@media x {
+      a {
+        @layer foo {
+          x:x
+        }
+      }
+    }`,
+    `@media x {
+      @layer foo {
+        a {
+          x:x
+        }
+      }
+    }`
+  )
+})
+
 test('third level dependencies #2', () => {
   run('.selector{:global{h2{color:pink}}}', '.selector :global h2{color:pink}')
+})
+
+test('Name of at-root is configurable', () => {
+  const rootRuleName = '_foobar_'
+  run(`a { & {} @${rootRuleName} { b {} } }`, `a {} b {}`, {
+    rootRuleName
+  })
+})
+
+test('The rooRuleName option may start with "@"', () => {
+  const rootRuleName = '@_foobar_'
+  run(`a { & {} ${rootRuleName} { b {} } }`, `a {} b {}`, {
+    rootRuleName
+  })
 })
 
 test.run()
