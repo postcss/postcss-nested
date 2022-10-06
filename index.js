@@ -1,27 +1,10 @@
-// @ts-check
 const { Rule, AtRule } = require('postcss')
 let parser = require('postcss-selector-parser')
 
-/** @typedef {import('postcss').Container}  Container */
-/** @typedef {import('postcss').ChildNode}  ChildNode */
-/** @typedef {import('postcss').Comment}  Comment */
-/** @typedef {import('postcss').Declaration}  Declaration */
-/** @typedef {import('postcss').Rule}  PostcssRule */
-/** @typedef {typeof import('postcss').Rule}  RuleConstructor */
-/** @typedef {parser.Root}  Root */
-/** @typedef {parser.Node}  Node */
-/** @typedef {parser.Selector}  Selector */
-/** @typedef {Record<string, true>}  RuleMap  Simple lookup table for \@-rules */
-
 /**
  * Run a selector string through postcss-selector-parser
- *
- * @param {string} rawSelector
- * @param {PostcssRule} [rule]
- * @returns {Selector}
  */
 function parse(rawSelector, rule) {
-  /** @type {Root | undefined} */
   let nodes
   try {
     parser(parsed => {
@@ -34,9 +17,7 @@ function parse(rawSelector, rule) {
       throw rule ? rule.error(e.message) : e
     }
   }
-  // Should be safe, but @ts-check can't deduce the side-effect
-  // triggered by `saver.processSync(str)`
-  return /** @type {Root} */ (nodes).at(0)
+  return nodes.at(0)
 }
 
 /**
@@ -44,44 +25,33 @@ function parse(rawSelector, rule) {
  * similar to what SCSS does.
  *
  * Mutates the nodes list
- *
- * @param {Extract<Node, { nodes: Array }>} nodes
- * @param {Selector} parent
- * @returns {boolean} Indicating whether a replacement took place or not.
  */
 function interpolateAmpInSelector(nodes, parent) {
   let replaced = false
-  nodes.each(
-    /** @type {Node} */ node => {
-      if (node.type === 'nesting') {
-        let clonedParent = parent.clone({})
-        if (node.value !== '&') {
-          node.replaceWith(
-            parse(node.value.replace('&', clonedParent.toString()))
-          )
-        } else {
-          node.replaceWith(clonedParent)
-        }
+  nodes.each(node => {
+    if (node.type === 'nesting') {
+      let clonedParent = parent.clone({})
+      if (node.value !== '&') {
+        node.replaceWith(
+          parse(node.value.replace('&', clonedParent.toString()))
+        )
+      } else {
+        node.replaceWith(clonedParent)
+      }
+      replaced = true
+    } else if ('nodes' in node && node.nodes) {
+      if (interpolateAmpInSelector(node, parent)) {
         replaced = true
-      } else if ('nodes' in node && node.nodes) {
-        if (interpolateAmpInSelector(node, parent)) {
-          replaced = true
-        }
       }
     }
-  )
+  })
   return replaced
 }
 
 /**
  * Combines parent and child selectors, in a SCSS-like way
- *
- * @param {PostcssRule} parent
- * @param {PostcssRule} child
- * @returns {Array<string>} An array of new, merged selectors
  */
 function mergeSelectors(parent, child) {
-  /** @type {Array<string>} */
   let merged = []
   parent.selectors.forEach(sel => {
     let parentNode = parse(sel, parent)
@@ -93,10 +63,8 @@ function mergeSelectors(parent, child) {
       let node = parse(selector, child)
       let replaced = interpolateAmpInSelector(node, parentNode)
       if (!replaced) {
-        // NOTE: The type definitions for `postcss-selector-parser` seem to be
-        // badly outdated.
-        node.prepend(/** @type {any} */ (parser.combinator({ value: ' ' })))
-        node.prepend(/** @type {Selector} */ (parentNode.clone({})))
+        node.prepend(parser.combinator({ value: ' ' }))
+        node.prepend(parentNode.clone({}))
       }
       merged.push(node.toString())
     })
@@ -106,10 +74,6 @@ function mergeSelectors(parent, child) {
 
 /**
  * Move a child and its preceeding comment(s) to after "after"
- *
- * @param {ChildNode} child
- * @param {ChildNode} after
- * @returns {ChildNode} updated "after" node
  */
 function breakOut(child, after) {
   let prev = child.prev()
@@ -122,17 +86,8 @@ function breakOut(child, after) {
   return child
 }
 
-/**
- * @param {RuleMap} bubble
- */
 function createFnAtruleChilds(bubble) {
-  /**
-   * @param {PostcssRule} rule
-   * @param {AtRule} atrule
-   * @param {boolean} bubbling
-   */
   return function atruleChilds(rule, atrule, bubbling, mergeSels = bubbling) {
-    /** @type {Array<ChildNode>} */
     let children = []
     atrule.each(child => {
       if (child.type === 'rule' && bubbling) {
@@ -161,11 +116,6 @@ function createFnAtruleChilds(bubble) {
   }
 }
 
-/**
- * @param {string} selector
- * @param {Array<ChildNode>} declarations
- * @param {ChildNode} after
- */
 function pickDeclarations(selector, declarations, after) {
   let parent = new Rule({
     selector,
@@ -176,12 +126,7 @@ function pickDeclarations(selector, declarations, after) {
   return parent
 }
 
-/**
- * @param {Array<string>} defaults,
- * @param {Array<string>} [custom]
- */
 function atruleNames(defaults, custom) {
-  /** @type {RuleMap} */
   let list = {}
   for (let name of defaults) {
     list[name] = true
@@ -194,13 +139,6 @@ function atruleNames(defaults, custom) {
   return list
 }
 
-/** @typedef {{ type: 'basic', selector?: string, escapes?: never }}  AtRootBParams */
-/** @typedef {{ type: 'withrules', escapes: (rule: string) => boolean, selector?: never }}  AtRootWParams */
-/** @typedef {{ type: 'unknown', selector?: never, escapes?: never }}  AtRootUParams */
-/** @typedef {{ type: 'noop', selector?: never, escapes?: never }}  AtRootNParams */
-/** @typedef {AtRootBParams | AtRootWParams | AtRootNParams | AtRootUParams}  AtRootParams */
-
-/** @type {(params: string) => AtRootParams } */
 function parseRootRuleParams(params) {
   params = params.trim()
   let braceBlock = params.match(/^\((.*)\)$/)
@@ -210,7 +148,6 @@ function parseRootRuleParams(params) {
   let bits = braceBlock[1].match(/^(with(?:out)?):(.+)$/)
   if (bits) {
     let allowlist = bits[1] === 'with'
-    /** @type {RuleMap} */
     let rules = Object.fromEntries(
       bits[2]
         .trim()
@@ -236,52 +173,39 @@ function parseRootRuleParams(params) {
   return { type: 'unknown' }
 }
 
-/**
- * @param {AtRule} leaf
- * @returns {Array<AtRule>}
- */
 function getAncestorRules(leaf) {
-  /** @type {Array<AtRule>} */
-  const lineage = []
-  /** @type {Container | ChildNode | Document | undefined} */
+  let lineage = []
   let parent = leaf.parent
 
   while (parent && parent instanceof AtRule) {
-    lineage.push(/** @type {AtRule} */ (parent))
+    lineage.push(parent)
     parent = parent.parent
   }
   return lineage
 }
 
-/**
- * @param {AtRule} rule
- */
 function unwrapRootRule(rule) {
-  const escapes = rule[rootRuleEscapes]
+  let escapes = rule[rootRuleEscapes]
 
   if (!escapes) {
     rule.after(rule.nodes)
   } else {
-    const nodes = rule.nodes
+    let nodes = rule.nodes
 
-    /** @type {AtRule | undefined} */
     let topEscaped
     let topEscapedIdx = -1
-    /** @type {AtRule | undefined} */
     let breakoutLeaf
-    /** @type {AtRule | undefined} */
     let breakoutRoot
-    /** @type {AtRule | undefined} */
     let clone
 
-    const lineage = getAncestorRules(rule)
+    let lineage = getAncestorRules(rule)
     lineage.forEach((parent, i) => {
       if (escapes(parent.name)) {
         topEscaped = parent
         topEscapedIdx = i
         breakoutRoot = clone
       } else {
-        const oldClone = clone
+        let oldClone = clone
         clone = parent.clone({ nodes: [] })
         oldClone && clone.append(oldClone)
         breakoutLeaf = breakoutLeaf || clone
@@ -293,20 +217,18 @@ function unwrapRootRule(rule) {
     } else if (!breakoutRoot) {
       topEscaped.after(nodes)
     } else {
-      const leaf = /** @type {AtRule} */ (breakoutLeaf)
+      let leaf = breakoutLeaf
       leaf.append(nodes)
       topEscaped.after(breakoutRoot)
     }
 
     if (rule.next() && topEscaped) {
-      /** @type {AtRule | undefined} */
       let restRoot
       lineage.slice(0, topEscapedIdx + 1).forEach((parent, i, arr) => {
-        const oldRoot = restRoot
+        let oldRoot = restRoot
         restRoot = parent.clone({ nodes: [] })
         oldRoot && restRoot.append(oldRoot)
 
-        /** @type {Array<ChildNode>} */
         let nextSibs = []
         let _child = arr[i - 1] || rule
         let next = _child.next()
@@ -326,12 +248,9 @@ function unwrapRootRule(rule) {
 const rootRuleMergeSel = Symbol('rootRuleMergeSel')
 const rootRuleEscapes = Symbol('rootRuleEscapes')
 
-/**
- * @param {AtRule} rule
- */
 function normalizeRootRule(rule) {
   let { params } = rule
-  const { type, selector, escapes } = parseRootRuleParams(params)
+  let { type, selector, escapes } = parseRootRuleParams(params)
   if (type === 'unknown') {
     throw rule.error(
       `Unknown @${rule.name} parameter ${JSON.stringify(params)}`
@@ -348,9 +267,6 @@ function normalizeRootRule(rule) {
 
 const hasRootRule = Symbol('hasRootRule')
 
-// ---------------------------------------------------------------------------
-
-/** @type {import('./').Nested} */
 module.exports = (opts = {}) => {
   let bubble = atruleNames(['media', 'supports', 'layer'], opts.bubble)
   let atruleChilds = createFnAtruleChilds(bubble)
@@ -379,10 +295,8 @@ module.exports = (opts = {}) => {
 
     Rule(rule) {
       let unwrapped = false
-      /** @type {ChildNode} */
       let after = rule
       let copyDeclarations = false
-      /** @type {Array<ChildNode>} */
       let declarations = []
 
       rule.each(child => {

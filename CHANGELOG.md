@@ -1,14 +1,6 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Upcoming...
-* ... <!-- Add new lines here. -->
-* fix: Correctly handle `with`/`without` parameters on `@at-root`
-* feat: Add option `rootRuleName` to rename the custom `@at-root` rule
-* fix: Errors when handling sibling `@at-root` rule blocks
-* fix: Move all preceeding comments with rule
-* fix: `@layer` blocks should also bubble
-
 ## 5.0.6
 * Fixed custom at-rules nesting (by @bsak-shell).
 

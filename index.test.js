@@ -1,15 +1,10 @@
-// @ts-check
 let { equal, throws } = require('uvu/assert')
 let { test } = require('uvu')
 let postcss = require('postcss').default
 
 let plugin = require('./')
 
-/**
- * @param {string} css
- * @returns {string}
- */
-function normalise(css) {
+function normalize(css) {
   return css
     .replace(/([:;{}]|\*\/|\/\*)/g, ' $1 ')
     .replace(/\s\s+/g, ' ')
@@ -17,14 +12,9 @@ function normalise(css) {
     .trim()
 }
 
-/**
- * @param {string} input
- * @param {string} output
- * @param {plugin.Options | undefined} [opts]
- */
 function run(input, output, opts) {
   let result = postcss([plugin(opts)]).process(input, { from: '/test.css' })
-  equal(normalise(result.css), normalise(output))
+  equal(normalize(result.css), normalize(output))
   equal(result.warnings().length, 0)
 }
 
@@ -694,7 +684,7 @@ test('works with other visitors', () => {
       }
     }
   }
-  mixinPlugin.postcss = /** @type {const} */ (true)
+  mixinPlugin.postcss = true
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css
@@ -713,7 +703,7 @@ test('works with other visitors #2', () => {
       }
     }
   }
-  mixinPlugin.postcss = /** @type {const} */ (true)
+  mixinPlugin.postcss = true
   let out = postcss([plugin, mixinPlugin]).process(css, {
     from: undefined
   }).css
@@ -772,14 +762,14 @@ test('third level dependencies #2', () => {
 })
 
 test('Name of at-root is configurable', () => {
-  const rootRuleName = '_foobar_'
+  let rootRuleName = '_foobar_'
   run(`a { & {} @${rootRuleName} { b {} } }`, `a {} b {}`, {
     rootRuleName
   })
 })
 
 test('The rooRuleName option may start with "@"', () => {
-  const rootRuleName = '@_foobar_'
+  let rootRuleName = '@_foobar_'
   run(`a { & {} ${rootRuleName} { b {} } }`, `a {} b {}`, {
     rootRuleName
   })

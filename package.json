@@ -51,10 +51,7 @@
     "trailingComma": "none"
   },
   "eslintConfig": {
-    "extends": "@logux/eslint-config",
-    "rules": {
-      "prefer-let/prefer-let": 0
-    }
+    "extends": "@logux/eslint-config"
   },
   "c8": {
     "exclude": [
