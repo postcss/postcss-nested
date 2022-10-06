@@ -1,5 +1,5 @@
 // @ts-check
-const { Rule } = require('postcss')
+const { Rule, AtRule } = require('postcss')
 let parser = require('postcss-selector-parser')
 
 /** @typedef {import('postcss').Container}  Container */
@@ -7,7 +7,6 @@ let parser = require('postcss-selector-parser')
 /** @typedef {import('postcss').Comment}  Comment */
 /** @typedef {import('postcss').Declaration}  Declaration */
 /** @typedef {import('postcss').Rule}  PostcssRule */
-/** @typedef {import('postcss').AtRule}  AtRule */
 /** @typedef {typeof import('postcss').Rule}  RuleConstructor */
 /** @typedef {parser.Root}  Root */
 /** @typedef {parser.Node}  Node */
@@ -166,9 +165,8 @@ function createFnAtruleChilds(bubble) {
  * @param {string} selector
  * @param {Array<ChildNode>} declarations
  * @param {ChildNode} after
- * @param {RuleConstructor} Rule
  */
-function pickDeclarations(selector, declarations, after, Rule) {
+function pickDeclarations(selector, declarations, after) {
   let parent = new Rule({
     selector,
     nodes: []
@@ -222,13 +220,16 @@ function parseRootRuleParams(params) {
     if (allowlist && rules.all) {
       return { type: 'noop' }
     }
+    let escapes = rule => !!rules[rule]
+    if (rules.all) {
+      escapes = () => true
+    } else if (allowlist) {
+      escapes = rule => (rule === 'all' ? false : !rules[rule])
+    }
+
     return {
       type: 'withrules',
-      escapes: rules.all
-        ? () => true
-        : allowlist
-        ? rule => (rule === 'all' ? false : !rules[rule])
-        : rule => !!rules[rule]
+      escapes
     }
   }
   // Unrecognized brace block
@@ -242,14 +243,11 @@ function parseRootRuleParams(params) {
 function getAncestorRules(leaf) {
   /** @type {Array<AtRule>} */
   const lineage = []
-  /** @type {Container<ChildNode> | ChildNode | Document | undefined} */
-  let parent
-  parent = leaf.parent
+  /** @type {Container | ChildNode | Document | undefined} */
+  let parent = leaf.parent
 
-  while (parent) {
-    if (parent.type === 'atrule') {
-      lineage.push(/** @type {AtRule} */ (parent))
-    }
+  while (parent && parent instanceof AtRule) {
+    lineage.push(/** @type {AtRule} */ (parent))
     parent = parent.parent
   }
   return lineage
@@ -308,7 +306,7 @@ function unwrapRootRule(rule) {
         restRoot = parent.clone({ nodes: [] })
         oldRoot && restRoot.append(oldRoot)
 
-        /** @type {Array<ChildNode>} */
+        /** @type {Array<ChildNode>} */
         let nextSibs = []
         let _child = arr[i - 1] || rule
         let next = _child.next()
@@ -340,7 +338,7 @@ function normalizeRootRule(rule) {
     )
   }
   if (type === 'basic' && selector) {
-    let selectorBlock = new Rule({ selector: selector, nodes: rule.nodes })
+    let selectorBlock = new Rule({ selector, nodes: rule.nodes })
     rule.removeAll()
     rule.append(selectorBlock)
   }
@@ -379,7 +377,7 @@ module.exports = (opts = {}) => {
       })
     },
 
-    Rule(rule, { Rule }) {
+    Rule(rule) {
       let unwrapped = false
       /** @type {ChildNode} */
       let after = rule
@@ -390,7 +388,7 @@ module.exports = (opts = {}) => {
       rule.each(child => {
         if (child.type === 'rule') {
           if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after, Rule)
+            after = pickDeclarations(rule.selector, declarations, after)
             declarations = []
           }
 
@@ -400,7 +398,7 @@ module.exports = (opts = {}) => {
           after = breakOut(child, after)
         } else if (child.type === 'atrule') {
           if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after, Rule)
+            after = pickDeclarations(rule.selector, declarations, after)
             declarations = []
           }
           if (child.name === rootRuleName) {
@@ -426,7 +424,7 @@ module.exports = (opts = {}) => {
       })
 
       if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after, Rule)
+        after = pickDeclarations(rule.selector, declarations, after)
       }
 
       if (unwrapped && preserveEmpty !== true) {
