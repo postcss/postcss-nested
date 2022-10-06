@@ -1,6 +1,13 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.0
+* Added `@layer` to bubbling at-rules (by Már Örlygsson).
+* Added moving all preceding comments with rule (by Már Örlygsson).
+* Added `with` & `without` parameters on `@at-root` (by Már Örlygsson).
+* Added `rootRuleName` option (by Már Örlygsson).
+* Fixed handling sibling `@at-root` rule blocks (by Már Örlygsson).
+
 ## 5.0.6
 * Fixed custom at-rules nesting (by @bsak-shell).
 
@@ -12,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Fixed docs (by Samuel Charpentier).
 
 ## 5.0.3
-* Fixed compability with Autoprefixer by adding `@-webkit-keyframes` support.
+* Fixed compatibility with Autoprefixer by adding `@-webkit-keyframes` support.
 
 ## 5.0.2
 * Fixed compatibility with `postcss-mixins` by moving to visitor API.
