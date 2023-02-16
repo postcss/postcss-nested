@@ -4,7 +4,7 @@
      title="Philosopher’s stone, logo of PostCSS"
      src="https://postcss.org/logo-leftp.svg">
 
-[PostCSS] plugin to unwrap nested rules like how Sass does it.
+[PostCSS] plugin to unwrap nested rules closer to Sass syntax.
 
 ```css
 .phone {
