@@ -59,8 +59,6 @@ html {
 
 Related plugins:
 
-* Use [`postcss-atroot`] for `@at-root` at-rule to move nested child
-  to the CSS root.
 * Use [`postcss-current-selector`] **after** this plugin if you want
   to use current selector in properties or variables values.
 * Use [`postcss-nested-ancestors`] **before** this plugin if you want
@@ -77,7 +75,6 @@ Alternatives:
        alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
 
-[`postcss-atroot`]: https://github.com/OEvgeny/postcss-atroot
 [`postcss-current-selector`]: https://github.com/komlev/postcss-current-selector
 [`postcss-nested-ancestors`]: https://github.com/toomuchdesign/postcss-nested-ancestors
 [`postcss-nested-props`]:     https://github.com/jedmao/postcss-nested-props
