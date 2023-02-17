@@ -66,8 +66,7 @@ Related plugins:
 
 Alternatives:
 
-* See also [`postcss-nesting`], which implements [CSSWG draft]
-  (requires the `&` and introduces `@nest`).
+* See also [`postcss-nesting`], which implements [CSSWG draft].
 * [`postcss-nested-props`] for nested properties like `font-size`.
 
 <a href="https://evilmartians.com/?utm_source=postcss-nested">
