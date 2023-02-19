@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.1
+* Added `@container` to bubbling at-rules.
+
 ## 6.0
 * Added `@layer` to bubbling at-rules (by Már Örlygsson).
 * Added moving all preceding comments with rule (by Már Örlygsson).
