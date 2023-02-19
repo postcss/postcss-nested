@@ -1,7 +1,7 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 6.1
+## 6.0.1
 * Added `@container` to bubbling at-rules.
 
 ## 6.0
