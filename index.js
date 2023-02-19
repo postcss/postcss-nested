@@ -268,7 +268,10 @@ function normalizeRootRule(rule) {
 const hasRootRule = Symbol('hasRootRule')
 
 module.exports = (opts = {}) => {
-  let bubble = atruleNames(['media', 'supports', 'layer'], opts.bubble)
+  let bubble = atruleNames(
+    ['media', 'supports', 'layer', 'container'],
+    opts.bubble
+  )
   let atruleChilds = createFnAtruleChilds(bubble)
   let unwrap = atruleNames(
     [
