@@ -775,4 +775,11 @@ test('The rooRuleName option may start with "@"', () => {
   })
 })
 
+test('selector-less curly-brace blocks are removed from output', () => {
+  run(
+    '{ a {color:white} { b {color:red;} } }',
+    'a {color:white} b {color:red;}'
+  )
+})
+
 test.run()
