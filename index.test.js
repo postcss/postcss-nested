@@ -782,4 +782,25 @@ test('selector-less curly-brace blocks are removed from output', () => {
   )
 })
 
+test('root-level `&` is removed from output', () => {
+  run(
+    'a {color:white} & { b {color:red;} c & { & { color:green; } } & d {color:blue;} }',
+    'a {color:white} b {color:red;} c {color:green;} d {color:blue;}'
+  )
+})
+
+test('root level `&` inside @media is removed', () => {
+  run(
+    '@media screen { & { a {color:red;} b & {color:green;} } }',
+    '@media screen { a {color:red;} b {color:green;} }'
+  )
+})
+
+test('root level `&` with @media inside is removed', () => {
+  run(
+    '& { @media screen { a {color:red;} b & {color:green;} } }',
+    '@media screen { a {color:red;} b {color:green;} }'
+  )
+})
+
 test.run()
