@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "unit": "uvu . '\\.test\\.js$'",
-    "test": "c8 pnpm unit && eslint ."
+    "test:coverage": "c8 pnpm unit",
+    "test:lint": "eslint .",
+    "test": "pnpm run /^test:/"
   },
   "author": "Andrey Sitnik <andrey@sitnik.ru>",
   "license": "MIT",
@@ -33,19 +35,21 @@
     "postcss": "^8.2.14"
   },
   "dependencies": {
-    "postcss-selector-parser": "^6.0.11"
+    "postcss-selector-parser": "^6.0.13"
   },
   "devDependencies": {
-    "@logux/eslint-config": "^49.0.0",
-    "c8": "^7.13.0",
-    "clean-publish": "^4.1.1",
-    "eslint": "^8.36.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.6.1",
+    "@logux/eslint-config": "^52.0.1",
+    "c8": "^8.0.1",
+    "clean-publish": "^4.2.0",
+    "eslint": "^8.51.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.1.0",
+    "eslint-plugin-node-import": "^1.0.4",
+    "eslint-plugin-perfectionist": "^2.1.0",
     "eslint-plugin-prefer-let": "^3.0.1",
     "eslint-plugin-promise": "^6.1.1",
-    "postcss": "^8.4.21",
+    "postcss": "^8.4.31",
     "uvu": "^0.5.6"
   },
   "prettier": {

@@ -1,4 +1,4 @@
-const { Rule, AtRule } = require('postcss')
+const { AtRule, Rule } = require('postcss')
 let parser = require('postcss-selector-parser')
 
 /**
@@ -118,8 +118,8 @@ function createFnAtruleChilds(bubble) {
 
 function pickDeclarations(selector, declarations, after) {
   let parent = new Rule({
-    selector,
-    nodes: []
+    nodes: [],
+    selector
   })
   parent.append(declarations)
   after.after(parent)
@@ -143,7 +143,7 @@ function parseRootRuleParams(params) {
   params = params.trim()
   let braceBlock = params.match(/^\((.*)\)$/)
   if (!braceBlock) {
-    return { type: 'basic', selector: params }
+    return { selector: params, type: 'basic' }
   }
   let bits = braceBlock[1].match(/^(with(?:out)?):(.+)$/)
   if (bits) {
@@ -165,8 +165,8 @@ function parseRootRuleParams(params) {
     }
 
     return {
-      type: 'withrules',
-      escapes
+      escapes,
+      type: 'withrules'
     }
   }
   // Unrecognized brace block
@@ -250,14 +250,14 @@ const rootRuleEscapes = Symbol('rootRuleEscapes')
 
 function normalizeRootRule(rule) {
   let { params } = rule
-  let { type, selector, escapes } = parseRootRuleParams(params)
+  let { escapes, selector, type } = parseRootRuleParams(params)
   if (type === 'unknown') {
     throw rule.error(
       `Unknown @${rule.name} parameter ${JSON.stringify(params)}`
     )
   }
   if (type === 'basic' && selector) {
-    let selectorBlock = new Rule({ selector, nodes: rule.nodes })
+    let selectorBlock = new Rule({ nodes: rule.nodes, selector })
     rule.removeAll()
     rule.append(selectorBlock)
   }
@@ -287,13 +287,20 @@ module.exports = (opts = {}) => {
   let preserveEmpty = opts.preserveEmpty
 
   return {
-    postcssPlugin: 'postcss-nested',
-
     Once(root) {
       root.walkAtRules(rootRuleName, node => {
         normalizeRootRule(node)
         root[hasRootRule] = true
       })
+    },
+
+    postcssPlugin: 'postcss-nested',
+
+    RootExit(root) {
+      if (root[hasRootRule]) {
+        root.walkAtRules(rootRuleName, unwrapRootRule)
+        root[hasRootRule] = false
+      }
     },
 
     Rule(rule) {
@@ -347,13 +354,6 @@ module.exports = (opts = {}) => {
       if (unwrapped && preserveEmpty !== true) {
         rule.raws.semicolon = true
         if (rule.nodes.length === 0) rule.remove()
-      }
-    },
-
-    RootExit(root) {
-      if (root[hasRootRule]) {
-        root.walkAtRules(rootRuleName, unwrapRootRule)
-        root[hasRootRule] = false
       }
     }
   }

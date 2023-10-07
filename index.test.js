@@ -676,12 +676,12 @@ test('works with other visitors', () => {
   let css = 'a{b{color:red}@mixin;}'
   let mixinPlugin = () => {
     return {
-      postcssPlugin: 'mixin',
       AtRule: {
         mixin(node) {
           node.replaceWith('.in{.deep{color:blue}}')
         }
-      }
+      },
+      postcssPlugin: 'mixin'
     }
   }
   mixinPlugin.postcss = true
@@ -695,12 +695,12 @@ test('works with other visitors #2', () => {
   let css = 'a { @mixin; b {color:red} }'
   let mixinPlugin = () => {
     return {
-      postcssPlugin: 'mixin',
       AtRule: {
         mixin(node) {
           node.replaceWith('.in { .deep {color:blue} }')
         }
-      }
+      },
+      postcssPlugin: 'mixin'
     }
   }
   mixinPlugin.postcss = true
