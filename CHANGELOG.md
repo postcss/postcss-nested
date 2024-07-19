@@ -1,7 +1,10 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 6.0.1
+## 6.2.0
+* Added `@starting-style` to bubbling at-rules.
+
+## 6.1.0
 * Added `@container` to bubbling at-rules.
 
 ## 6.0
