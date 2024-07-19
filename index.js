@@ -269,7 +269,7 @@ const hasRootRule = Symbol('hasRootRule')
 
 module.exports = (opts = {}) => {
   let bubble = atruleNames(
-    ['media', 'supports', 'layer', 'container'],
+    ['media', 'supports', 'layer', 'container', 'starting-style'],
     opts.bubble
   )
   let atruleChilds = createFnAtruleChilds(bubble)
