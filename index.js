@@ -137,15 +137,11 @@ function pickAndClearDeclarations(ruleSelector, declarations, after, clear = tru
   return [after, declarations]
 }
 
-function atruleNames(defaults, custom) {
+function atruleNames(defaults, custom = '') {
+  let names = defaults.concat(custom)
   let list = {}
-  for (let name of defaults) {
-    list[name] = true
-  }
-  if (custom) {
-    for (let name of custom) {
-      list[name.replace(/^@/, '')] = true
-    }
+  for (let name of names) {
+    list[name.replace(/^@/, '')] = true
   }
   return list
 }
