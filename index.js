@@ -125,6 +125,17 @@ function pickDeclarations(selector, declarations, after) {
   after.after(parent)
   return parent
 }
+function pickAndClearDeclarations(ruleSelector, declarations, after, clear = true) {
+  if (!declarations.length) return [after, declarations]
+
+  after = pickDeclarations(ruleSelector, declarations, after)
+
+  if (clear) {
+    declarations = []
+  }
+
+  return [after, declarations]
+}
 
 function atruleNames(defaults, custom) {
   let list = {}
@@ -312,10 +323,7 @@ module.exports = (opts = {}) => {
       rule.each(child => {
         switch (child.type) {
           case 'rule':
-            if (declarations.length) {
-              after = pickDeclarations(rule.selector, declarations, after)
-              declarations = []
-            }
+            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
 
             copyDeclarations = true
             unwrapped = true
@@ -324,10 +332,8 @@ module.exports = (opts = {}) => {
 
             break
           case 'atrule':
-            if (declarations.length) {
-              after = pickDeclarations(rule.selector, declarations, after)
-              declarations = []
-            }
+            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
+
             if (child.name === rootRuleName) {
               unwrapped = true
               atruleChilds(rule, child, true, child[rootRuleMergeSel])
@@ -356,9 +362,7 @@ module.exports = (opts = {}) => {
         }
       })
 
-      if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after)
-      }
+      pickAndClearDeclarations(rule.selector, declarations, after, false)
 
       if (unwrapped && preserveEmpty !== true) {
         rule.raws.semicolon = true
