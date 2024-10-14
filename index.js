@@ -53,12 +53,12 @@ function interpolateAmpInSelector(nodes, parent) {
  */
 function mergeSelectors(parent, child) {
   let merged = []
-  parent.selectors.forEach(sel => {
+  for (let sel of parent.selectors) {
     let parentNode = parse(sel, parent)
 
-    child.selectors.forEach(selector => {
+    for (let selector of child.selectors) {
       if (!selector) {
-        return
+        continue
       }
       let node = parse(selector, child)
       let replaced = interpolateAmpInSelector(node, parentNode)
@@ -67,13 +67,13 @@ function mergeSelectors(parent, child) {
         node.prepend(parentNode.clone({}))
       }
       merged.push(node.toString())
-    })
-  })
+    }
+  }
   return merged
 }
 
 /**
- * Move a child and its preceeding comment(s) to after "after"
+ * Move a child and its preceding comment(s) to after "after"
  */
 function breakOut(child, after) {
   let prev = child.prev()
@@ -104,14 +104,12 @@ function createFnAtruleChilds(bubble) {
         children.push(child)
       }
     })
-    if (bubbling) {
-      if (children.length) {
-        let clone = rule.clone({ nodes: [] })
-        for (let child of children) {
-          clone.append(child)
-        }
-        atrule.prepend(clone)
+    if (bubbling && children.length) {
+      let clone = rule.clone({ nodes: [] })
+      for (let child of children) {
+        clone.append(child)
       }
+      atrule.prepend(clone)
     }
   }
 }
@@ -304,10 +302,10 @@ module.exports = (opts = {}) => {
     postcssPlugin: 'postcss-nested',
 
     RootExit(root) {
-      if (root[hasRootRule]) {
-        root.walkAtRules(rootRuleName, unwrapRootRule)
-        root[hasRootRule] = false
-      }
+      if (!root[hasRootRule]) return
+
+      root.walkAtRules(rootRuleName, unwrapRootRule)
+      root[hasRootRule] = false
     },
 
     Rule(rule) {
