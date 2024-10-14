@@ -310,40 +310,49 @@ module.exports = (opts = {}) => {
       let declarations = []
 
       rule.each(child => {
-        if (child.type === 'rule') {
-          if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after)
-            declarations = []
-          }
+        switch (child.type) {
+          case 'rule':
+            if (declarations.length) {
+              after = pickDeclarations(rule.selector, declarations, after)
+              declarations = []
+            }
 
-          copyDeclarations = true
-          unwrapped = true
-          child.selectors = mergeSelectors(rule, child)
-          after = breakOut(child, after)
-        } else if (child.type === 'atrule') {
-          if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after)
-            declarations = []
-          }
-          if (child.name === rootRuleName) {
-            unwrapped = true
-            atruleChilds(rule, child, true, child[rootRuleMergeSel])
-            after = breakOut(child, after)
-          } else if (bubble[child.name]) {
             copyDeclarations = true
             unwrapped = true
-            atruleChilds(rule, child, true)
+            child.selectors = mergeSelectors(rule, child)
             after = breakOut(child, after)
-          } else if (unwrap[child.name]) {
-            copyDeclarations = true
-            unwrapped = true
-            atruleChilds(rule, child, false)
-            after = breakOut(child, after)
-          } else if (copyDeclarations) {
-            declarations.push(child)
-          }
-        } else if (child.type === 'decl' && copyDeclarations) {
-          declarations.push(child)
+
+            break
+          case 'atrule':
+            if (declarations.length) {
+              after = pickDeclarations(rule.selector, declarations, after)
+              declarations = []
+            }
+            if (child.name === rootRuleName) {
+              unwrapped = true
+              atruleChilds(rule, child, true, child[rootRuleMergeSel])
+              after = breakOut(child, after)
+            } else if (bubble[child.name]) {
+              copyDeclarations = true
+              unwrapped = true
+              atruleChilds(rule, child, true)
+              after = breakOut(child, after)
+            } else if (unwrap[child.name]) {
+              copyDeclarations = true
+              unwrapped = true
+              atruleChilds(rule, child, false)
+              after = breakOut(child, after)
+            } else if (copyDeclarations) {
+              declarations.push(child)
+            }
+
+            break
+          case 'decl':
+            if (copyDeclarations) {
+              declarations.push(child)
+            }
+
+            break
         }
       })
 
