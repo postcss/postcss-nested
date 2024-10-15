@@ -74,15 +74,10 @@ function mergeSelectors(parent, child) {
 
 /**
  * Move a child and its preceding comment(s) to after "after"
+ * ! It is necessary to clarify the comment
  */
 function breakOut(child, after) {
-  let prev = child.prev()
   after.after(child)
-  while (prev && prev.type === 'comment') {
-    let nextPrev = prev.prev()
-    after.after(prev)
-    prev = nextPrev
-  }
   return child
 }
 
