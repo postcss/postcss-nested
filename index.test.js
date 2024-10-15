@@ -605,15 +605,19 @@ test('clears empty selector after comma', () => {
 })
 
 test('moves comment with rule', () => {
-  run('a { /*B*/ /*B2*/ b {} }', '/*B*/ /*B2*/ a b {}')
+  run('a { /*B*/ /*B2*/ b {} }', 'a { /*B*/ /*B2*/ } a b {}')
 })
 
 test('moves comment with at-rule', () => {
-  run('a { /*B*/ @media { one: 1 } }', '/*B*/ @media {a { one: 1 } }')
+  run('a { /*B*/ @media { one: 1 } }', 'a { /*B*/ } @media {a { one: 1 } }')
 })
 
 test('moves comment with declaration', () => {
   run('a { @media { /*B*/ one: 1 } }', '@media {a { /*B*/ one: 1 } }')
+})
+
+test('moves comment with declaration without properties', () => {
+  run('a { @media { /*B*/ } }', '@media {a { /*B*/ } }')
 })
 
 test('saves order of rules', () => {
