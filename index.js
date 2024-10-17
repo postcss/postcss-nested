@@ -77,7 +77,31 @@ function mergeSelectors(parent, child) {
  * ! It is necessary to clarify the comment
  */
 function breakOut(child, after) {
-  after.after(child)
+  let changeParent = true
+
+  for (let node of after.nodes) {
+    if (!node.nodes) continue
+
+    let prevNode = node.prev()
+    if (prevNode?.type != 'comment') continue
+
+    let parentRule = after.toString()
+
+    /* Checking that the comment "describes" the rule following. Like this:
+      /* comment about the rule below /*
+      .rule {}
+    */
+    if (parentRule.includes(prevNode.toString() + node.toString())) {
+      changeParent = false
+      after.after(node).after(prevNode)
+    }
+  }
+
+  // It is necessary if the above child has never been moved
+  if (changeParent) {
+    after.after(child)
+  }
+
   return child
 }
 
