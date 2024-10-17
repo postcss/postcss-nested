@@ -608,7 +608,7 @@ test("Save the parent's comment", () => {
   run('a { /*i*/ b {} }', 'a { /*i*/ } a b {}')
 })
 
-test('Save the comment for the parent and child', () => {
+test('Save the comments for the parent and child', () => {
   run(
     `a { 
     /*i*/ 
@@ -619,11 +619,13 @@ test('Save the comment for the parent and child', () => {
   )
 })
 
-test('moves comments with at-rule', () => {
+test('Save the comments for the parent and child with at-rule', () => {
   run(
-    `a { /*i*/ /*o*/
+    `a { /*i*/ 
+    /*o*/
     @media { one: 1 } }`,
-    'a { /*i*/ } /*o*/ @media {a { one: 1 } }'
+
+    `a { /*i*/ } /*o*/ @media {a { one: 1 } }`
   )
 })
 
