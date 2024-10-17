@@ -604,20 +604,27 @@ test('clears empty selector after comma', () => {
   run('a, b { .one, .two, {} }', 'a .one, a .two, b .one, b .two {}')
 })
 
-test('moves comment with rule', () => {
-  run('a { /*B*/ /*B2*/ b {} }', 'a { /*B*/ /*B2*/ } a b {}')
+test("Save the parent's comment", () => {
+  run('a { /*i*/ b {} }', 'a { /*i*/ } a b {}')
 })
 
-test('moves comment with at-rule', () => {
-  run('a { /*B*/ @media { one: 1 } }', 'a { /*B*/ } @media {a { one: 1 } }')
+test('Save the comment for the parent and child', () => {
+  run('a { /*i*/ /*o*/b {} }', 'a { /*i*/ } /*o*/ a b {}')
+})
+
+test('moves comments with at-rule', () => {
+  run(
+    'a { /*i*/ /*o*/@media { one: 1 } }',
+    'a { /*i*/ } /*o*/ @media {a { one: 1 } }'
+  )
 })
 
 test('moves comment with declaration', () => {
-  run('a { @media { /*B*/ one: 1 } }', '@media {a { /*B*/ one: 1 } }')
+  run('a { @media { /*B*/ one: 1 } }', '@media { a { /*B*/ one: 1 } }')
 })
 
 test('moves comment with declaration without properties', () => {
-  run('a { @media { /*B*/ } }', '@media {a { /*B*/ } }')
+  run('a { @media { /*B*/ } }', '@media { a { /*B*/ } }')
 })
 
 test('saves order of rules', () => {
