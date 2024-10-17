@@ -91,7 +91,9 @@ function breakOut(child, after) {
       /* comment about the rule below /*
       .rule {}
     */
-    if (parentRule.includes(prevNode.toString() + node.toString())) {
+    let regexp = new RegExp(`${prevNode.toString()} *\n *${node.toString()}`)
+
+    if (parentRule.match(regexp)) {
       changeParent = false
       after.after(node).after(prevNode)
     }
