@@ -35,21 +35,21 @@
     "postcss": "^8.2.14"
   },
   "dependencies": {
-    "postcss-selector-parser": "^6.1.1"
+    "postcss-selector-parser": "^6.1.2"
   },
   "devDependencies": {
-    "@logux/eslint-config": "^53.2.1",
+    "@logux/eslint-config": "^53.4.1",
     "c8": "^10.1.2",
     "clean-publish": "^5.0.0",
-    "eslint": "^9.7.0",
+    "eslint": "^9.12.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^17.9.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.11.1",
     "eslint-plugin-node-import": "^1.0.4",
-    "eslint-plugin-perfectionist": "^2.11.0",
+    "eslint-plugin-perfectionist": "^3.9.1",
     "eslint-plugin-prefer-let": "^4.0.0",
-    "eslint-plugin-promise": "^6.4.0",
-    "postcss": "^8.4.39",
+    "eslint-plugin-promise": "^7.1.0",
+    "postcss": "^8.4.47",
     "uvu": "^0.5.6"
   },
   "prettier": {

@@ -1,5 +1,5 @@
-let { equal, throws } = require('uvu/assert')
 let { test } = require('uvu')
+let { equal, throws } = require('uvu/assert')
 let postcss = require('postcss').default
 
 let plugin = require('./')
