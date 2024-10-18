@@ -51,29 +51,3 @@ jobs:
         run: pnpm install --ignore-scripts
       - name: Run unit tests
         run: pnpm unit
-  old:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version:
-          - 16
-          - 14
-          - 12
-    name: Node.js ${{ matrix.node-version }} Quick
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-      - name: Install Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
-      - name: Run unit tests
-        run: pnpm unit
