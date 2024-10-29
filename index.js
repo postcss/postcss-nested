@@ -83,7 +83,7 @@ function breakOut(child, after) {
     if (!node.nodes) continue
 
     let prevNode = node.prev()
-    if (prevNode?.type != 'comment') continue
+    if (prevNode?.type !== 'comment') continue
 
     let parentRule = after.toString()
 
