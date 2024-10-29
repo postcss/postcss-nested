@@ -35,13 +35,13 @@
     "postcss": "^8.2.14"
   },
   "dependencies": {
-    "postcss-selector-parser": "^6.1.2"
+    "postcss-selector-parser": "^7.0.0"
   },
   "devDependencies": {
-    "@logux/eslint-config": "^53.4.1",
+    "@logux/eslint-config": "^53.4.2",
     "c8": "^10.1.2",
-    "clean-publish": "^5.0.0",
-    "eslint": "^9.12.0",
+    "clean-publish": "^5.1.0",
+    "eslint": "^9.13.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-n": "^17.11.1",
