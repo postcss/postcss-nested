@@ -1,6 +1,10 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0
+* More complex logic of when to move comments (by @Ulyanov-programmer).
+* Removed Node.js 16, 14, and 12 support.
+
 ## 6.2.0
 * Added `@starting-style` to bubbling at-rules.
 
