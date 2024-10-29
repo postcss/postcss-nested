@@ -53,12 +53,12 @@ function interpolateAmpInSelector(nodes, parent) {
  */
 function mergeSelectors(parent, child) {
   let merged = []
-  parent.selectors.forEach(sel => {
+  for (let sel of parent.selectors) {
     let parentNode = parse(sel, parent)
 
-    child.selectors.forEach(selector => {
+    for (let selector of child.selectors) {
       if (!selector) {
-        return
+        continue
       }
       let node = parse(selector, child)
       let replaced = interpolateAmpInSelector(node, parentNode)
@@ -67,22 +67,43 @@ function mergeSelectors(parent, child) {
         node.prepend(parentNode.clone({}))
       }
       merged.push(node.toString())
-    })
-  })
+    }
+  }
   return merged
 }
 
 /**
- * Move a child and its preceeding comment(s) to after "after"
+ * Move a child and its preceding comment(s) to after "after"
+ * ! It is necessary to clarify the comment
  */
 function breakOut(child, after) {
-  let prev = child.prev()
-  after.after(child)
-  while (prev && prev.type === 'comment') {
-    let nextPrev = prev.prev()
-    after.after(prev)
-    prev = nextPrev
+  let changeParent = true
+
+  for (let node of after.nodes) {
+    if (!node.nodes) continue
+
+    let prevNode = node.prev()
+    if (prevNode?.type !== 'comment') continue
+
+    let parentRule = after.toString()
+
+    /* Checking that the comment "describes" the rule following. Like this:
+      /* comment about the rule below /*
+      .rule {}
+    */
+    let regexp = new RegExp(`${prevNode.toString()} *\n *${node.toString()}`)
+
+    if (parentRule.match(regexp)) {
+      changeParent = false
+      after.after(node).after(prevNode)
+    }
   }
+
+  // It is necessary if the above child has never been moved
+  if (changeParent) {
+    after.after(child)
+  }
+
   return child
 }
 
@@ -104,14 +125,12 @@ function createFnAtruleChilds(bubble) {
         children.push(child)
       }
     })
-    if (bubbling) {
-      if (children.length) {
-        let clone = rule.clone({ nodes: [] })
-        for (let child of children) {
-          clone.append(child)
-        }
-        atrule.prepend(clone)
+    if (bubbling && children.length) {
+      let clone = rule.clone({ nodes: [] })
+      for (let child of children) {
+        clone.append(child)
       }
+      atrule.prepend(clone)
     }
   }
 }
@@ -125,16 +144,23 @@ function pickDeclarations(selector, declarations, after) {
   after.after(parent)
   return parent
 }
+function pickAndClearDeclarations(ruleSelector, declarations, after, clear = true) {
+  if (!declarations.length) return [after, declarations]
 
-function atruleNames(defaults, custom) {
-  let list = {}
-  for (let name of defaults) {
-    list[name] = true
+  after = pickDeclarations(ruleSelector, declarations, after)
+
+  if (clear) {
+    declarations = []
   }
-  if (custom) {
-    for (let name of custom) {
-      list[name.replace(/^@/, '')] = true
-    }
+
+  return [after, declarations]
+}
+
+function atruleNames(defaults, custom = '') {
+  let names = defaults.concat(custom)
+  let list = {}
+  for (let name of names) {
+    list[name.replace(/^@/, '')] = true
   }
   return list
 }
@@ -297,10 +323,10 @@ module.exports = (opts = {}) => {
     postcssPlugin: 'postcss-nested',
 
     RootExit(root) {
-      if (root[hasRootRule]) {
-        root.walkAtRules(rootRuleName, unwrapRootRule)
-        root[hasRootRule] = false
-      }
+      if (!root[hasRootRule]) return
+
+      root.walkAtRules(rootRuleName, unwrapRootRule)
+      root[hasRootRule] = false
     },
 
     Rule(rule) {
@@ -310,46 +336,48 @@ module.exports = (opts = {}) => {
       let declarations = []
 
       rule.each(child => {
-        if (child.type === 'rule') {
-          if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after)
-            declarations = []
-          }
+        switch (child.type) {
+          case 'rule':
+            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
 
-          copyDeclarations = true
-          unwrapped = true
-          child.selectors = mergeSelectors(rule, child)
-          after = breakOut(child, after)
-        } else if (child.type === 'atrule') {
-          if (declarations.length) {
-            after = pickDeclarations(rule.selector, declarations, after)
-            declarations = []
-          }
-          if (child.name === rootRuleName) {
-            unwrapped = true
-            atruleChilds(rule, child, true, child[rootRuleMergeSel])
-            after = breakOut(child, after)
-          } else if (bubble[child.name]) {
             copyDeclarations = true
             unwrapped = true
-            atruleChilds(rule, child, true)
+            child.selectors = mergeSelectors(rule, child)
             after = breakOut(child, after)
-          } else if (unwrap[child.name]) {
-            copyDeclarations = true
-            unwrapped = true
-            atruleChilds(rule, child, false)
-            after = breakOut(child, after)
-          } else if (copyDeclarations) {
-            declarations.push(child)
-          }
-        } else if (child.type === 'decl' && copyDeclarations) {
-          declarations.push(child)
+
+            break
+          case 'atrule':
+            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
+
+            if (child.name === rootRuleName) {
+              unwrapped = true
+              atruleChilds(rule, child, true, child[rootRuleMergeSel])
+              after = breakOut(child, after)
+            } else if (bubble[child.name]) {
+              copyDeclarations = true
+              unwrapped = true
+              atruleChilds(rule, child, true)
+              after = breakOut(child, after)
+            } else if (unwrap[child.name]) {
+              copyDeclarations = true
+              unwrapped = true
+              atruleChilds(rule, child, false)
+              after = breakOut(child, after)
+            } else if (copyDeclarations) {
+              declarations.push(child)
+            }
+
+            break
+          case 'decl':
+            if (copyDeclarations) {
+              declarations.push(child)
+            }
+
+            break
         }
       })
 
-      if (declarations.length) {
-        after = pickDeclarations(rule.selector, declarations, after)
-      }
+      pickAndClearDeclarations(rule.selector, declarations, after, false)
 
       if (unwrapped && preserveEmpty !== true) {
         rule.raws.semicolon = true
