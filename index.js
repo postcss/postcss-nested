@@ -337,15 +337,6 @@ module.exports = (opts = {}) => {
 
       rule.each(child => {
         switch (child.type) {
-          case 'rule':
-            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
-
-            copyDeclarations = true
-            unwrapped = true
-            child.selectors = mergeSelectors(rule, child)
-            after = breakOut(child, after)
-
-            break
           case 'atrule':
             [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
 
@@ -372,6 +363,15 @@ module.exports = (opts = {}) => {
             if (copyDeclarations) {
               declarations.push(child)
             }
+
+            break
+          case 'rule':
+            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
+
+            copyDeclarations = true
+            unwrapped = true
+            child.selectors = mergeSelectors(rule, child)
+            after = breakOut(child, after)
 
             break
         }
