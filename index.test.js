@@ -608,6 +608,16 @@ test("Save the parent's comment", () => {
   run('a { /*i*/ b {} }', 'a { /*i*/ } a b {}')
 })
 
+test("Save the parent's comment with newline", () => {
+  run(
+    `a { 
+    /*i*/
+
+     b {} }`,
+    `a { /*i*/ } a b {}`
+  )
+})
+
 test('Save the comments for the parent and child', () => {
   run(
     `a { 
