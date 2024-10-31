@@ -75,35 +75,25 @@ function mergeSelectors(parent, child) {
 /**
  * Move a child and its preceding comment(s) to after "after"
  */
-function breakOut(child, parent) {
-  let changeParent = true
-  let lastNode = parent
-
-  for (let node of parent.nodes) {
-    if (!node.nodes) continue
-
-    let prevNode = node.prev()
-    if (prevNode?.type !== 'comment') continue
-
-    let parentRule = parent.toString()
-
-    /* Checking that the comment "describes" the rule following. Like this:
-      /* comment about the rule below /*
-      .rule {}
-    */
-    let regexp = /[*]\/ *\n.*{/
-
-    if (parentRule.match(regexp)) {
-      changeParent = false
-      lastNode.after(node).after(prevNode)
-
-      lastNode = node
-    }
+function breakOut(child, currentNode) {
+  if (child.prev()?.type !== 'comment') {
+    currentNode.after(child)
+    return child
   }
 
-  // It is necessary if the above child has never been moved
-  if (changeParent) {
-    parent.after(child)
+  let prevNode = child.prev()
+
+  /* Checking that the comment "describes" the rule following. Like this:
+    /* comment about the rule below *\
+    .rule {}
+  */
+  let regexp = /[*]\/ *\n.*{/
+
+  if (child.parent.toString().match(regexp)) {
+    currentNode.after(child).after(prevNode)
+  }
+  else {
+    currentNode.after(child)
   }
 
   return child
