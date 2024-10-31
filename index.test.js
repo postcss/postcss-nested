@@ -618,21 +618,20 @@ div {
     '/* Comment with ^ $ . | ? * + () */ div[data-roots-all^=1] * #id .class {}')
 })
 
-// !
-// test("Save the parent's comment with newline", () => {
-//   run(
-//     `
-// a { 
-//   /*i*/
+test("Save several rules with attached comments", () => {
+  run(
+    `
+a { 
+  /*i*/
 
-//   /*i2*/
-//   b {} 
-//   /*i3*/
-//   s {} 
-// }`,
-//     `a { /*i*/ } /*i2*/ a b {} /*i3*/ a s {}`
-//   )
-// })
+  /*i2*/
+  b {} 
+  /*i3*/
+  s {} 
+}`,
+    `a { /*i*/ } /*i2*/ a b {} /*i3*/ a s {}`
+  )
+})
 
 test("Save the parent's comment with newline", () => {
   run(
