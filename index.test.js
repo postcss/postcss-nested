@@ -608,12 +608,39 @@ test("Save the parent's comment", () => {
   run('a { /*i*/ b {} }', 'a { /*i*/ } a b {}')
 })
 
+test("Save the parent's comment", () => {
+  run(
+    `
+div {
+  /* Comment with ^ $ . | ? * + () */
+  &[data-roots-all^=1] * #id .class {}
+}`,
+    '/* Comment with ^ $ . | ? * + () */ div[data-roots-all^=1] * #id .class {}')
+})
+
+// !
+// test("Save the parent's comment with newline", () => {
+//   run(
+//     `
+// a { 
+//   /*i*/
+
+//   /*i2*/
+//   b {} 
+//   /*i3*/
+//   s {} 
+// }`,
+//     `a { /*i*/ } /*i2*/ a b {} /*i3*/ a s {}`
+//   )
+// })
+
 test("Save the parent's comment with newline", () => {
   run(
     `a { 
     /*i*/
 
-     b {} }`,
+     b {} 
+     }`,
     `a { /*i*/ } a b {}`
   )
 })
