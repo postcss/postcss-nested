@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.1
+* Fixed RegExp issue with nested comments (by @Ulyanov-programmer).
+
 ## 7.0.0
 * More complex logic of when to move comments (by @Ulyanov-programmer).
 * Removed Node.js 16, 14, and 12 support.

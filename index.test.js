@@ -646,10 +646,12 @@ test("Save the parent's comment with newline", () => {
 
 test('Save the comments for the parent and child', () => {
   run(
-    `a { 
-    /*i*/ 
-    /*o*/
-    b {} }`,
+    `
+a { 
+  /*i*/ 
+  /*o*/
+  b {} 
+}`,
 
     `a { /*i*/ } /*o*/ a b {}`
   )
