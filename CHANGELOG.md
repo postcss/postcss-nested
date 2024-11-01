@@ -1,6 +1,9 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.2
+* Fixed nested selector regression (by @Ulyanov-programmer).
+
 ## 7.0.1
 * Fixed RegExp issue with nested comments (by @Ulyanov-programmer).
 
