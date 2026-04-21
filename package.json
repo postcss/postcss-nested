@@ -15,7 +15,7 @@
     "test:lint": "eslint .",
     "test": "pnpm run /^test:/"
   },
-  "author": "Andrey Sitnik <andrey@sitnik.ru>",
+  "author": "Andrey Sitnik <andrey@sitnik.es>",
   "license": "MIT",
   "repository": "postcss/postcss-nested",
   "engines": {
