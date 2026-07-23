@@ -69,10 +69,11 @@ Alternatives:
 - See also [`postcss-nesting`], which implements [CSSWG draft].
 - [`postcss-nested-props`] for nested properties like `font-size`.
 
-<a href="https://evilmartians.com/?utm_source=postcss-nested">
-  <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg"
-       alt="Sponsored by Evil Martians" width="236" height="54">
-</a>
+---
+
+<img src="https://cdn.evilmartians.com/badges/logo-no-label.svg" alt="" width="22" height="16" />  PostCSS Nested is built by <b><a href="https://evilmartians.com/">Evil Martians</a></b>, an American design and engineering consultancy for <b>developer tools, AI, and cybersecurity startups</b>.
+
+---
 
 [`postcss-current-selector`]: https://github.com/komlev/postcss-current-selector
 [`postcss-nested-ancestors`]: https://github.com/toomuchdesign/postcss-nested-ancestors
