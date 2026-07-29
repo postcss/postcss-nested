@@ -10,7 +10,6 @@
     "sass"
   ],
   "license": "MIT",
-  "type": "module",
   "author": "Andrey Sitnik <andrey@sitnik.es>",
   "repository": "postcss/postcss-nested",
   "funding": [
@@ -23,6 +22,7 @@
       "url": "https://github.com/sponsors/ai"
     }
   ],
+  "type": "module",
   "scripts": {
     "test:coverage": "pnpm bnt --coverage 100",
     "test:lint": "oxlint",

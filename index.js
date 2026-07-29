@@ -331,7 +331,7 @@ let nested = (opts = {}) => {
 
       rule.each(child => {
         if (child.type === 'atrule') {
-          [after, declarations] = pickAndClearDeclarations(
+          ;[after, declarations] = pickAndClearDeclarations(
             rule.selector,
             declarations,
             after
@@ -359,7 +359,7 @@ let nested = (opts = {}) => {
             declarations.push(child)
           }
         } else if (child.type === 'rule') {
-          [after, declarations] = pickAndClearDeclarations(
+          ;[after, declarations] = pickAndClearDeclarations(
             rule.selector,
             declarations,
             after
