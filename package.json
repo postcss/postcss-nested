@@ -3,24 +3,16 @@
   "version": "7.0.2",
   "description": "PostCSS plugin to unwrap nested rules like how Sass does it",
   "keywords": [
-    "postcss",
     "css",
+    "nested",
+    "postcss",
     "postcss-plugin",
-    "sass",
-    "nested"
+    "sass"
   ],
-  "scripts": {
-    "unit": "uvu . '\\.test\\.js$'",
-    "test:coverage": "c8 pnpm unit",
-    "test:lint": "eslint .",
-    "test": "pnpm run /^test:/"
-  },
-  "author": "Andrey Sitnik <andrey@sitnik.es>",
   "license": "MIT",
+  "type": "module",
+  "author": "Andrey Sitnik <andrey@sitnik.es>",
   "repository": "postcss/postcss-nested",
-  "engines": {
-    "node": ">=18.0"
-  },
   "funding": [
     {
       "type": "opencollective",
@@ -31,46 +23,26 @@
       "url": "https://github.com/sponsors/ai"
     }
   ],
+  "scripts": {
+    "test:coverage": "pnpm bnt --coverage 100",
+    "test:lint": "oxlint",
+    "test": "pnpm run /^test:/"
+  },
+  "dependencies": {
+    "postcss-selector-parser": "^7.1.4"
+  },
+  "devDependencies": {
+    "@logux/oxc-configs": "^1.0.0",
+    "better-node-test": "^1.0.0",
+    "oxlint": "^1.76.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "postcss": "^8.5.25",
+    "typescript": "^7.0.2"
+  },
   "peerDependencies": {
     "postcss": "^8.2.14"
   },
-  "dependencies": {
-    "postcss-selector-parser": "^7.0.0"
-  },
-  "devDependencies": {
-    "@logux/eslint-config": "^53.4.2",
-    "c8": "^10.1.2",
-    "clean-publish": "^5.1.0",
-    "eslint": "^9.13.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-n": "^17.12.0",
-    "eslint-plugin-node-import": "^1.0.4",
-    "eslint-plugin-perfectionist": "^3.9.1",
-    "eslint-plugin-prefer-let": "^4.0.0",
-    "eslint-plugin-promise": "^7.1.0",
-    "postcss": "^8.4.47",
-    "uvu": "^0.5.6"
-  },
-  "prettier": {
-    "arrowParens": "avoid",
-    "jsxSingleQuote": false,
-    "quoteProps": "consistent",
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "none"
-  },
-  "eslintConfig": {
-    "extends": "@logux/eslint-config"
-  },
-  "c8": {
-    "exclude": [
-      "**/*.test.*"
-    ],
-    "lines": 100,
-    "check-coverage": true
-  },
-  "clean-publish": {
-    "cleanDocs": true
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0 || >= 26.0.0"
   }
 }

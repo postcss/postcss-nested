@@ -1,7 +1,7 @@
 // Original definitions (@types/postcss-nested)
 // by Maxim Vorontsov <https://github.com/VorontsovMaxim>
 
-import { PluginCreator } from 'postcss'
+import type { PluginCreator } from 'postcss'
 
 declare namespace nested {
   interface Options {
@@ -36,6 +36,6 @@ declare namespace nested {
   type Nested = PluginCreator<Options>
 }
 
-declare const nested: nested.Nested
+declare let nested: nested.Nested
 
-export = nested
+export default nested

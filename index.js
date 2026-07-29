@@ -1,5 +1,5 @@
-const { AtRule, Rule } = require('postcss')
-let parser = require('postcss-selector-parser')
+import { AtRule, Rule } from 'postcss'
+import parser from 'postcss-selector-parser'
 
 /**
  * Run a selector string through postcss-selector-parser
@@ -91,8 +91,7 @@ function breakOut(child, currentNode) {
 
   if (child.parent.toString().match(regexp)) {
     currentNode.after(child).after(prevNode)
-  }
-  else {
+  } else {
     currentNode.after(child)
   }
 
@@ -110,7 +109,7 @@ function createFnAtruleChilds(bubble) {
       } else if (child.type === 'atrule' && child.nodes) {
         if (bubble[child.name]) {
           atruleChilds(rule, child, mergeSels)
-        } else if (atrule[rootRuleMergeSel] !== false) {
+        } else if (atrule[ROOT_RULE_MERGE_SEL] !== false) {
           children.push(child)
         }
       } else {
@@ -136,15 +135,15 @@ function pickDeclarations(selector, declarations, after) {
   after.after(parent)
   return parent
 }
-function pickAndClearDeclarations(ruleSelector, declarations, after, clear = true) {
+function pickAndClearDeclarations(
+  ruleSelector,
+  declarations,
+  after,
+  clear = true
+) {
   if (!declarations.length) return [after, declarations]
-
   after = pickDeclarations(ruleSelector, declarations, after)
-
-  if (clear) {
-    declarations = []
-  }
-
+  if (clear) declarations = []
   return [after, declarations]
 }
 
@@ -203,7 +202,7 @@ function getAncestorRules(leaf) {
 }
 
 function unwrapRootRule(rule) {
-  let escapes = rule[rootRuleEscapes]
+  let escapes = rule[ROOT_RULE_ESCAPES]
 
   if (!escapes) {
     rule.after(rule.nodes)
@@ -225,7 +224,7 @@ function unwrapRootRule(rule) {
       } else {
         let oldClone = clone
         clone = parent.clone({ nodes: [] })
-        oldClone && clone.append(oldClone)
+        if (oldClone) clone.append(oldClone)
         breakoutLeaf = breakoutLeaf || clone
       }
     })
@@ -245,26 +244,29 @@ function unwrapRootRule(rule) {
       lineage.slice(0, topEscapedIdx + 1).forEach((parent, i, arr) => {
         let oldRoot = restRoot
         restRoot = parent.clone({ nodes: [] })
-        oldRoot && restRoot.append(oldRoot)
+        if (oldRoot) restRoot.append(oldRoot)
 
         let nextSibs = []
-        let _child = arr[i - 1] || rule
-        let next = _child.next()
+        let child = arr[i - 1] || rule
+        let next = child.next()
         while (next) {
           nextSibs.push(next)
           next = next.next()
         }
         restRoot.append(nextSibs)
       })
-      restRoot && (breakoutRoot || nodes[nodes.length - 1]).after(restRoot)
+      if (restRoot) {
+        let insert = breakoutRoot || nodes[nodes.length - 1]
+        insert.after(restRoot)
+      }
     }
   }
 
   rule.remove()
 }
 
-const rootRuleMergeSel = Symbol('rootRuleMergeSel')
-const rootRuleEscapes = Symbol('rootRuleEscapes')
+const ROOT_RULE_MERGE_SEL = Symbol('rootRuleMergeSel')
+const ROOT_RULE_ESCAPES = Symbol('rootRuleEscapes')
 
 function normalizeRootRule(rule) {
   let { params } = rule
@@ -279,13 +281,13 @@ function normalizeRootRule(rule) {
     rule.removeAll()
     rule.append(selectorBlock)
   }
-  rule[rootRuleEscapes] = escapes
-  rule[rootRuleMergeSel] = escapes ? !escapes('all') : type === 'noop'
+  rule[ROOT_RULE_ESCAPES] = escapes
+  rule[ROOT_RULE_MERGE_SEL] = escapes ? !escapes('all') : type === 'noop'
 }
 
-const hasRootRule = Symbol('hasRootRule')
+const HAS_ROOT_RULE = Symbol('hasRootRule')
 
-module.exports = (opts = {}) => {
+let nested = (opts = {}) => {
   let bubble = atruleNames(
     ['media', 'supports', 'layer', 'container', 'starting-style'],
     opts.bubble
@@ -308,17 +310,17 @@ module.exports = (opts = {}) => {
     Once(root) {
       root.walkAtRules(rootRuleName, node => {
         normalizeRootRule(node)
-        root[hasRootRule] = true
+        root[HAS_ROOT_RULE] = true
       })
     },
 
     postcssPlugin: 'postcss-nested',
 
     RootExit(root) {
-      if (!root[hasRootRule]) return
+      if (!root[HAS_ROOT_RULE]) return
 
       root.walkAtRules(rootRuleName, unwrapRootRule)
-      root[hasRootRule] = false
+      root[HAS_ROOT_RULE] = false
     },
 
     Rule(rule) {
@@ -328,44 +330,45 @@ module.exports = (opts = {}) => {
       let declarations = []
 
       rule.each(child => {
-        switch (child.type) {
-          case 'atrule':
-            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
+        if (child.type === 'atrule') {
+          [after, declarations] = pickAndClearDeclarations(
+            rule.selector,
+            declarations,
+            after
+          )
 
-            if (child.name === rootRuleName) {
-              unwrapped = true
-              atruleChilds(rule, child, true, child[rootRuleMergeSel])
-              after = breakOut(child, after)
-            } else if (bubble[child.name]) {
-              copyDeclarations = true
-              unwrapped = true
-              atruleChilds(rule, child, true)
-              after = breakOut(child, after)
-            } else if (unwrap[child.name]) {
-              copyDeclarations = true
-              unwrapped = true
-              atruleChilds(rule, child, false)
-              after = breakOut(child, after)
-            } else if (copyDeclarations) {
-              declarations.push(child)
-            }
-
-            break
-          case 'decl':
-            if (copyDeclarations) {
-              declarations.push(child)
-            }
-
-            break
-          case 'rule':
-            [after, declarations] = pickAndClearDeclarations(rule.selector, declarations, after)
-
+          if (child.name === rootRuleName) {
+            unwrapped = true
+            atruleChilds(rule, child, true, child[ROOT_RULE_MERGE_SEL])
+            after = breakOut(child, after)
+          } else if (bubble[child.name]) {
             copyDeclarations = true
             unwrapped = true
-            child.selectors = mergeSelectors(rule, child)
+            atruleChilds(rule, child, true)
             after = breakOut(child, after)
+          } else if (unwrap[child.name]) {
+            copyDeclarations = true
+            unwrapped = true
+            atruleChilds(rule, child, false)
+            after = breakOut(child, after)
+          } else if (copyDeclarations) {
+            declarations.push(child)
+          }
+        } else if (child.type === 'decl') {
+          if (copyDeclarations) {
+            declarations.push(child)
+          }
+        } else if (child.type === 'rule') {
+          [after, declarations] = pickAndClearDeclarations(
+            rule.selector,
+            declarations,
+            after
+          )
 
-            break
+          copyDeclarations = true
+          unwrapped = true
+          child.selectors = mergeSelectors(rule, child)
+          after = breakOut(child, after)
         }
       })
 
@@ -378,4 +381,6 @@ module.exports = (opts = {}) => {
     }
   }
 }
-module.exports.postcss = true
+nested.postcss = true
+
+export default nested

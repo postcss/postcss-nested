@@ -100,12 +100,15 @@ and set this plugin in settings.
 **Step 3:** Add the plugin to plugins list:
 
 ```diff
-module.exports = {
-  plugins: [
-+   require('postcss-nested'),
-    require('autoprefixer')
-  ]
-}
++import postcssNested from 'postcss-nested'
+ import autoprefixer from 'autoprefixer'
+
+ export default {
+   plugins: [
++    postcssNested,
+     autoprefixer
+   ]
+ }
 ```
 
 [official docs]: https://github.com/postcss/postcss#usage
@@ -119,7 +122,7 @@ By default, plugin will bubble only `@media`, `@supports`, `@layer`,
 to add your custom at-rules to this list.
 
 ```js
-postcss([require('postcss-nested')({ bubble: ['phone'] })])
+postcss([postcssNested({ bubble: ['phone'] })])
 ```
 
 ```css
@@ -147,7 +150,7 @@ By default, plugin will unwrap only `@font-face`, `@keyframes` and `@document`
 at-rules. You can add your custom at-rules to this list by `unwrap` option:
 
 ```js
-postcss([require('postcss-nested')({ unwrap: ['phone'] })])
+postcss([postcssNested({ unwrap: ['phone'] })])
 ```
 
 ```css
@@ -199,7 +202,7 @@ blocks out of their nested position. If you want, you can choose a new
 custom name for this rule in your code.
 
 ```js
-postcss([require('postcss-nested')({ rootRuleName: '_escape-nesting' })])
+postcss([postcssNested({ rootRuleName: '_escape-nesting' })])
 ```
 
 ```css

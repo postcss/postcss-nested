@@ -1,8 +1,8 @@
-let { test } = require('uvu')
-let { equal, throws } = require('uvu/assert')
-let postcss = require('postcss').default
+import { equal, throws } from 'node:assert'
+import { test } from 'node:test'
+import postcss from 'postcss'
 
-let plugin = require('./')
+import plugin from './index.js'
 
 function normalize(css) {
   return css
@@ -615,10 +615,11 @@ div {
   /* Comment with ^ $ . | ? * + () */
   &[data-roots-all^=1] * #id .class {}
 }`,
-    '/* Comment with ^ $ . | ? * + () */ div[data-roots-all^=1] * #id .class {}')
+    '/* Comment with ^ $ . | ? * + () */ div[data-roots-all^=1] * #id .class {}'
+  )
 })
 
-test("Save several rules with attached comments", () => {
+test('Save several rules with attached comments', () => {
   run(
     `
 a { 
@@ -833,5 +834,3 @@ test('The rooRuleName option may start with "@"', () => {
     rootRuleName
   })
 })
-
-test.run()
