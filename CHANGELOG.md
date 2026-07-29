@@ -2,6 +2,12 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.0.0
+
+- Added npm provenance.
+- Moved to ESM.
+- Dropped Node.js 18 and 20 support.
+
 ## 7.0.2
 
 - Fixed nested selector regression (by @Ulyanov-programmer).
