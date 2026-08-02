@@ -23,6 +23,10 @@
     }
   ],
   "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test:coverage": "pnpm bnt --coverage 100",
     "test:lint": "oxlint",
