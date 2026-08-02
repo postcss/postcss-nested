@@ -2,6 +2,10 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.0.1
+
+- Fixed `DEP0151` warning in Node.js.
+
 ## 8.0.0
 
 - Added npm provenance.
