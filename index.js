@@ -149,7 +149,7 @@ function pickAndClearDeclarations(
 
 function atruleNames(defaults, custom = '') {
   let names = defaults.concat(custom)
-  let list = {}
+  let list = Object.create(null)
   for (let name of names) {
     list[name.replace(/^@/, '')] = true
   }
