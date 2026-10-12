@@ -729,6 +729,19 @@ test('replaces ampersands in not selector', () => {
   run('.a { &:not(&.no) {} }', '.a:not(.a.no) {}')
 })
 
+test('keeps all parent selectors inside not selector', () => {
+  run('.a, .b { .x:not(&) {} }', '.x:not(.a, .b) {}')
+  run(
+    '.a, .b { &:not(&.on) {} }',
+    '.a:not(.a.on, .b.on), .b:not(.a.on, .b.on) {}'
+  )
+  run(
+    '.a, .b { .x:not(.z, &), .y:not(:is(&)), .w {} }',
+    '.x:not(.z, .a, .b), .y:not(:is(.a, .b)), .a .w, .b .w {}'
+  )
+  run('.a, .b { .x:is(&) {} }', '.x:is(.a), .x:is(.b) {}')
+})
+
 test('correctly replaces tail ampersands', () => {
   run('.a { .b & {} }', '.b .a {}')
 })
