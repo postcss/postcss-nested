@@ -15,11 +15,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Clean npm package
-        uses: ai/clean-npm-project@29219e611c2da08a07cb0a6a1b965c162e5940a9 # v0.3.0
+        uses: ai/clean-npm-project@3f664d1a83e04a2be737b7ad4e0b5a4e1b7dbc08 # v0.3.1
         with:
           clean-docs: true
       - name: Install Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 26
           package-manager-cache: false

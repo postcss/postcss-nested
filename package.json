@@ -33,14 +33,14 @@
     "test": "pnpm run /^test:/"
   },
   "dependencies": {
-    "postcss-selector-parser": "^7.1.4"
+    "postcss-selector-parser": "^7.1.6"
   },
   "devDependencies": {
-    "@logux/oxc-configs": "^1.0.0",
+    "@logux/oxc-configs": "^1.2.0",
     "better-node-test": "^1.0.0",
-    "oxlint": "^1.76.0",
-    "oxlint-tsgolint": "^7.0.2001",
-    "postcss": "^8.5.25",
+    "oxlint": "^1.87.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "postcss": "^8.5.29",
     "typescript": "^7.0.2"
   },
   "peerDependencies": {
