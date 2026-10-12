@@ -716,6 +716,11 @@ test('replaces ampersand in adjacent sibling selector', () => {
   run('div { & + & {} }', 'div + div {}')
 })
 
+test('replaces each ampersand with every parent selector', () => {
+  run('.a, .b { & + & {} }', '.a + .a, .a + .b, .b + .a, .b + .b {}')
+  run('.a, .b { &-x ~ & {} }', '.a-x ~ .a, .a-x ~ .b, .b-x ~ .a, .b-x ~ .b {}')
+})
+
 test('replaces ampersands in not selector', () => {
   run('.a { &:not(&.no) {} }', '.a:not(.a.no) {}')
 })
