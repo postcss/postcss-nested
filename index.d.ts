@@ -3,39 +3,35 @@
 
 import type { PluginCreator } from 'postcss'
 
-declare namespace nested {
-  interface Options {
-    /**
-     * By default, plugin will bubble only `@media`, `@supports` and `@layer`
-     * at-rules. Use this option to add your custom at-rules to this list.
-     */
-    bubble?: string[]
+export interface Options {
+  /**
+   * By default, plugin will bubble only `@media`, `@supports` and `@layer`
+   * at-rules. Use this option to add your custom at-rules to this list.
+   */
+  bubble?: string[]
 
-    /**
-     * By default, plugin will unwrap only `@font-face`, `@keyframes`,
-     * and `@document` at-rules. You can add your custom at-rules
-     * to this list by this option.
-     */
-    unwrap?: string[]
+  /**
+   * By default, plugin will unwrap only `@font-face`, `@keyframes`,
+   * and `@document` at-rules. You can add your custom at-rules
+   * to this list by this option.
+   */
+  unwrap?: string[]
 
-    /**
-     * By default, plugin will strip out any empty selector generated
-     * by intermediate nesting levels. You can set this option to `true`
-     * to preserve them.
-     */
-    preserveEmpty?: boolean
+  /**
+   * By default, plugin will strip out any empty selector generated
+   * by intermediate nesting levels. You can set this option to `true`
+   * to preserve them.
+   */
+  preserveEmpty?: boolean
 
-    /**
-     * The plugin supports the SCSS custom at-rule `@at-root` which breaks
-     * rule blocks out of their nested position. If you want, you can choose
-     * a new custom name for this rule in your code.
-     */
-    rootRuleName?: string
-  }
-
-  type Nested = PluginCreator<Options>
+  /**
+   * The plugin supports the SCSS custom at-rule `@at-root` which breaks
+   * rule blocks out of their nested position. If you want, you can choose
+   * a new custom name for this rule in your code.
+   */
+  rootRuleName?: string
 }
 
-declare let nested: nested.Nested
+declare let nested: PluginCreator<Options>
 
 export default nested
