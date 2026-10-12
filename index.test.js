@@ -35,9 +35,13 @@ test('does not bubble inherited object property names', () => {
 })
 
 test('bubbles explicitly configured inherited object property names', () => {
-  run('a { @constructor { color: red } }', '@constructor { a { color: red } }', {
-    bubble: ['constructor']
-  })
+  run(
+    'a { @constructor { color: red } }',
+    '@constructor { a { color: red } }',
+    {
+      bubble: ['constructor']
+    }
+  )
 })
 
 test('preserve empty rules if preserveEmpty is set to true', () => {
