@@ -21,6 +21,18 @@ function parse(rawSelector, rule) {
 }
 
 /**
+ * Replaces one "&" token with the parent selector
+ */
+function replaceAmp(node, parent) {
+  let clonedParent = parent.clone({})
+  if (node.value !== '&') {
+    node.replaceWith(parse(node.value.replace('&', clonedParent.toString())))
+  } else {
+    node.replaceWith(clonedParent)
+  }
+}
+
+/**
  * Replaces the "&" token in a node's selector with the parent selector
  * similar to what SCSS does.
  *
@@ -30,14 +42,7 @@ function interpolateAmpInSelector(nodes, parent) {
   let replaced = false
   nodes.each(node => {
     if (node.type === 'nesting') {
-      let clonedParent = parent.clone({})
-      if (node.value !== '&') {
-        node.replaceWith(
-          parse(node.value.replace('&', clonedParent.toString()))
-        )
-      } else {
-        node.replaceWith(clonedParent)
-      }
+      replaceAmp(node, parent)
       replaced = true
     } else if ('nodes' in node && node.nodes) {
       if (interpolateAmpInSelector(node, parent)) {
@@ -53,14 +58,30 @@ function interpolateAmpInSelector(nodes, parent) {
  */
 function mergeSelectors(parent, child) {
   let merged = []
-  for (let sel of parent.selectors) {
-    let parentNode = parse(sel, parent)
-
+  let parents = parent.selectors.map(sel => parse(sel, parent))
+  for (let parentNode of parents) {
     for (let selector of child.selectors) {
       if (!selector) {
         continue
       }
       let node = parse(selector, child)
+      let amps = node.nodes.filter(i => i.type === 'nesting')
+      if (amps.length > 1) {
+        // Like in Sass, every "&" after the first one takes each parent selector
+        let combos = [[parentNode]]
+        for (let i = 1; i < amps.length; i++) {
+          combos = combos.flatMap(combo => parents.map(p => [...combo, p]))
+        }
+        for (let combo of combos) {
+          let copy = node.clone()
+          copy.nodes
+            .filter(i => i.type === 'nesting')
+            .forEach((amp, i) => replaceAmp(amp, combo[i]))
+          interpolateAmpInSelector(copy, parentNode)
+          merged.push(copy.toString())
+        }
+        continue
+      }
       let replaced = interpolateAmpInSelector(node, parentNode)
       if (!replaced) {
         node.prepend(parser.combinator({ value: ' ' }))
