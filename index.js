@@ -54,6 +54,53 @@ function interpolateAmpInSelector(nodes, parent) {
 }
 
 /**
+ * Pseudo-classes which take a selector list
+ */
+const SELECTOR_LISTS = new Set([':has', ':is', ':not', ':where'])
+
+/**
+ * Replaces "&" inside :not() with the whole parent selector list, like Sass.
+ * A copy for each parent selector would turn "neither .a nor .b"
+ * into "not .a or not .b".
+ *
+ * Mutates the nodes list
+ */
+function replaceAmpsInNot(nodes, parents, negated = false) {
+  let replaced = false
+  nodes.each(node => {
+    if (node.type !== 'pseudo') {
+      return
+    }
+    let name = node.value.toLowerCase()
+    let inside = negated || name === ':not'
+    node.each(selector => {
+      if (replaceAmpsInNot(selector, parents, inside)) {
+        replaced = true
+      }
+      let amps = selector.nodes.filter(i => i.type === 'nesting')
+      if (!inside || !SELECTOR_LISTS.has(name) || amps.length === 0) {
+        return
+      }
+      let combos = [[]]
+      for (let i = 0; i < amps.length; i++) {
+        combos = combos.flatMap(combo => parents.map(p => [...combo, p]))
+      }
+      let list = combos.map(combo => {
+        let copy = selector.clone()
+        copy.nodes
+          .filter(i => i.type === 'nesting')
+          .forEach((amp, i) => replaceAmp(amp, combo[i]))
+        return copy.toString().trim()
+      })
+      let space = node.index(selector) > 0 ? ' ' : ''
+      selector.replaceWith(...parser().astSync(space + list.join(', ')).nodes)
+      replaced = true
+    })
+  })
+  return replaced
+}
+
+/**
  * Combines parent and child selectors, in a SCSS-like way
  */
 function mergeSelectors(parent, child) {
@@ -65,6 +112,15 @@ function mergeSelectors(parent, child) {
         continue
       }
       let node = parse(selector, child)
+      let replacedInNot = replaceAmpsInNot(node, parents)
+      let ampsLeft = false
+      node.walkNesting(() => {
+        ampsLeft = true
+      })
+      // Without "&" outside :not(), every parent selector gives the same result
+      if (replacedInNot && !ampsLeft && parentNode !== parents[0]) {
+        continue
+      }
       let amps = node.nodes.filter(i => i.type === 'nesting')
       if (amps.length > 1) {
         // Like in Sass, every "&" after the first one takes each parent selector
@@ -82,7 +138,7 @@ function mergeSelectors(parent, child) {
         }
         continue
       }
-      let replaced = interpolateAmpInSelector(node, parentNode)
+      let replaced = interpolateAmpInSelector(node, parentNode) || replacedInNot
       if (!replaced) {
         node.prepend(parser.combinator({ value: ' ' }))
         node.prepend(parentNode.clone({}))
