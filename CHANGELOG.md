@@ -2,6 +2,11 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.0
+
+- Fixed compatibility with Sass nested and CSS nesting (by @wahidrizka).
+  See #176 and #179.
+
 ## 8.0.1
 
 - Fixed `DEP0151` warning in Node.js.
