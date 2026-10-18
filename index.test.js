@@ -709,6 +709,17 @@ test('copies rule for declarations after nested rule and before at-rule', () => 
   )
 })
 
+test('copies rule for declarations after nested rule inside at-rule', () => {
+  run(
+    'a { @media screen { a: 1; &b { b: 2 } c: 1; &c { d: 5 } e: 6 } }',
+    '@media screen { a { a: 1 } ab { b: 2 } a { c: 1 } ac { d: 5 } a { e: 6 } }'
+  )
+  run(
+    'a { @supports (a: 1) { &b { b: 2 } c: 1 } }',
+    '@supports (a: 1) { ab { b: 2 } a { c: 1 } }'
+  )
+})
+
 test('does not replace ampersand inside string', () => {
   run(
     'div { &[data-category="sound & vision"] {} }',

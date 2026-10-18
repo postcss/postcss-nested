@@ -178,10 +178,16 @@ function breakOut(child, currentNode) {
 function createFnAtruleChilds(bubble) {
   return function atruleChilds(rule, atrule, bubbling, mergeSels = bubbling) {
     let children = []
+    let groups = []
     atrule.each(child => {
       if (child.type === 'rule' && bubbling) {
         if (mergeSels) {
           child.selectors = mergeSelectors(rule, child)
+        }
+        // Declarations after a nested rule stay after it, like outside at-rules
+        if (children.length) {
+          groups.push(children)
+          children = []
         }
       } else if (child.type === 'atrule' && child.nodes) {
         if (bubble[child.name]) {
@@ -193,12 +199,15 @@ function createFnAtruleChilds(bubble) {
         children.push(child)
       }
     })
-    if (bubbling && children.length) {
-      let clone = rule.clone({ nodes: [] })
-      for (let child of children) {
-        clone.append(child)
+    if (children.length) groups.push(children)
+    if (bubbling) {
+      for (let group of groups) {
+        let clone = rule.clone({ nodes: [] })
+        group[0].before(clone)
+        for (let child of group) {
+          clone.append(child)
+        }
       }
-      atrule.prepend(clone)
     }
   }
 }
