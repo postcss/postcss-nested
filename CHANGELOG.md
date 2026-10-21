@@ -2,6 +2,10 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.1
+
+- Fixed declarations after nested rules inside at-rules (by @wahidrizka).
+
 ## 9.0.0
 
 - Fixed compatibility with Sass nested and CSS nesting (by @wahidrizka).
