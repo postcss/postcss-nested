@@ -62,6 +62,20 @@ test('at-root short hand', () => {
   run('a { & {} @at-root b { } }', 'a {} b {}')
 })
 
+test('keeps declarations after at-root shorthand in source order', () => {
+  run(
+    'a { color: red; @at-root a { color: blue; } color: green; }',
+    'a { color: red; } a { color: blue; } a { color: green; }'
+  )
+})
+
+test('keeps declarations after an at-root block in source order', () => {
+  run(
+    'a { color: red; @at-root { a { color: blue; } } color: green; }',
+    'a { color: red; } a { color: blue; } a { color: green; }'
+  )
+})
+
 test('hoists multiple at-roots', () => {
   run(
     `a {

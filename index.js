@@ -424,6 +424,7 @@ let nested = (opts = {}) => {
           )
 
           if (child.name === rootRuleName) {
+            copyDeclarations = true
             unwrapped = true
             atruleChilds(rule, child, true, child[ROOT_RULE_MERGE_SEL])
             after = breakOut(child, after)
